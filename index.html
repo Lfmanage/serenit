@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#F5F0E9">
 <title>Sérénité</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -58,13 +58,13 @@
   --scrim:rgba(0,0,0,.55); color-scheme:dark;
 }
 *,*::before,*::after{box-sizing:inherit}
-html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation}
 body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.45 var(--sans);-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;overflow-x:hidden}
 body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;pointer-events:none}
 body::before{top:-140px;right:-120px;width:360px;height:360px;background:var(--halo-1);filter:blur(64px)}
 body::after{top:40%;left:-180px;width:320px;height:320px;background:var(--halo-2);filter:blur(76px)}
 button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit}
+button{cursor:pointer;background:none;border:0;padding:0;text-align:inherit;touch-action:manipulation}
 a{color:var(--brand-ink);text-decoration:none}
 :focus-visible{outline:2px solid var(--brand-ink);outline-offset:2px;border-radius:10px}
 [hidden]{display:none!important}
@@ -160,7 +160,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .op{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)}
 .list>.op:last-child,.list>.srow:last-child{border-bottom:0}
 .op .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.op .nm{font-size:16px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.op .nm{font-size:16px;font-weight:500;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;line-height:1.3}
 .op .amt{font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;white-space:nowrap}
 .op .amt.in{color:var(--pos)}
 .op.new{animation:rise .6s cubic-bezier(.2,.8,.2,1) both}
@@ -298,7 +298,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
 .quick-grid button{display:flex;flex-direction:column;align-items:flex-start;gap:14px;min-height:118px;padding:18px 16px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);text-align:left;font-weight:600;font-size:16px}
 .quick-grid small{display:block;font-weight:400;color:var(--ink-2);font-size:13.5px;margin-top:2px}
-.scrim.confirm{align-items:center;z-index:60;padding:22px}
+.scrim.confirm{align-items:center;z-index:120;padding:22px}
 .dialog{background:var(--bg);border-radius:26px;padding:24px;max-width:380px;width:100%;box-shadow:var(--shadow-lg)}
 .dialog h3{margin:0 0 8px;font-family:var(--serif);font-weight:400;font-size:22px}
 .dialog p{margin:0 0 20px;color:var(--ink-2);line-height:1.45}
@@ -369,7 +369,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .srow{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink);min-height:64px}
 .srow .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .srow .nm{font-size:16px;font-weight:500}
-.srow select,.srow input[type=time],.srow input[type=number]{height:40px;border-radius:12px;border:0;background-color:var(--surface-2);padding:0 34px 0 12px;font-size:15px;max-width:55%;-webkit-appearance:none;appearance:none}
+.srow select,.srow input[type=time],.srow input[type=number]{height:40px;border-radius:12px;border:0;background-color:var(--surface-2);padding:0 34px 0 12px;font-size:16px;max-width:55%;-webkit-appearance:none;appearance:none}
 .srow input[type=time],.srow input[type=number]{padding:0 10px;width:auto}
 .srow input[type=number]{width:72px}
 .srow input[type=range]{accent-color:var(--brand);width:46%}
@@ -499,6 +499,47 @@ body.privacy #main,body.privacy .tabs,body.privacy .fab,body.privacy .scrim,body
 @keyframes breathe{50%{box-shadow:0 0 0 20px color-mix(in srgb,var(--brand) 6%,transparent)}}
 #main{transition:opacity .5s ease}
 #main.arrive{opacity:0}
+
+
+/* Version 6 : accueil bancaire, comptes, accès, couleurs */
+input,select,textarea{font-size:16px}
+.tabs nav,.fab{transition:transform .38s cubic-bezier(.2,.8,.2,1),opacity .3s ease}
+.tabs.hide nav{transform:translateY(calc(100% + 30px));opacity:0;pointer-events:none}
+.hero .lbl-top{display:block;font-size:12.5px;font-weight:600;letter-spacing:.08em;color:var(--ink-2);margin-bottom:6px}
+.hero .dispo{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;margin-top:14px;padding:12px 14px;border-radius:16px;background:rgba(255,255,255,.45);color:var(--ink);font-size:14.5px;text-align:left;min-height:44px}
+:root[data-theme="dark"] .hero .dispo{background:rgba(255,255,255,.06)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hero .dispo{background:rgba(255,255,255,.06)}}
+.hero .dispo span{flex:1;display:flex;flex-direction:column;line-height:1.3}
+.hero .dispo small{font-size:12.5px;color:var(--ink-2)}
+.hero .dispo b{font-weight:600;white-space:nowrap;font-size:15.5px}
+.hero .dispo svg{width:18px;height:18px;flex:none;opacity:.7}
+.hero .say{margin:12px 0 0}
+.qa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:-6px 0 28px}
+.qa button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:4px 2px;font-size:13px;font-weight:500;color:var(--ink);text-align:center;line-height:1.25}
+.qa button span{width:56px;height:56px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--brand-ink)}
+.qa button span svg{width:24px;height:24px}
+.acc{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)}
+.list>.acc:last-child{border-bottom:0}
+.acc .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.acc .nm{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.acc .amt{font-family:var(--serif);font-size:19px;white-space:nowrap}
+.btns.four .btn:first-child{flex:1 1 100%}
+.btns.four .btn{flex:1 1 28%;padding:0 10px}
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:14px 8px}
+.swatch-b{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);text-align:center;line-height:1.2;min-height:64px}
+.swatch-b .swatch{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);transition:transform .2s}
+.swatch-b[aria-checked="true"]{color:var(--ink);font-weight:600}
+.swatch-b[aria-checked="true"] .swatch{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink);transform:scale(1.05)}
+#lock .bio-go{display:none;width:92px;height:92px;border-radius:30px;background:var(--surface);box-shadow:var(--shadow);place-items:center;color:var(--brand-ink)}
+#lock .bio-go svg{width:44px;height:44px}
+#lock.bio-mode .bio-go{display:grid}
+#lock.bio-mode .pin-dots,#lock.bio-mode .keypad{display:none}
+#lock .keypad button{touch-action:manipulation;-webkit-user-select:none;user-select:none}
+#viewbar{position:fixed;left:50%;transform:translateX(-50%);top:calc(10px + env(safe-area-inset-top,0px));z-index:40;display:flex;align-items:center;gap:12px;max-width:calc(100% - 24px);padding:8px 8px 8px 14px;border-radius:999px;background:var(--ink);color:var(--bg);font-size:13.5px;box-shadow:var(--shadow-lg)}
+#viewbar span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#viewbar button{flex:none;min-height:34px;padding:0 12px;border-radius:999px;background:var(--brand);color:var(--on-brand);font-weight:600;font-size:13px}
+body.viewing .app{padding-top:48px}
+body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet [data-del],body.viewing .sheet [data-pay],body.viewing .sheet [data-later],body.viewing .sheet [data-skip],body.viewing .sheet [data-unpay],body.viewing .sheet [data-restore],body.viewing .sheet [data-e],body.viewing .sheet [data-d],body.viewing .sheet [data-w],body.viewing .sheet .btn.block[data-a],body.viewing .markpaid,body.viewing .later,body.viewing .inc-card .btns{display:none!important}
 
 /* Animations désactivées */
 .no-anim *,.no-anim *::before,.no-anim *::after{animation:none!important;transition:none!important}
@@ -633,7 +674,7 @@ const POCKET_ICONS=['wallet','box','sprout','card','cart','fuel','home','leaf','
 const WAVE='<svg viewBox="0 0 400 16" preserveAspectRatio="none" aria-hidden="true"><path d="M0 8Q25 0 50 8T100 8T150 8T200 8T250 8T300 8T350 8T400 8V16H0Z"/></svg>';
 
 /* ---------- Données de base ---------- */
-const DEFAULT_POCKETS=[{id:'salaire',name:'Salaire',type:'courant',ic:'wallet',show:true},{id:'lfor',name:'LFOR LIVRAISON',type:'courant',ic:'box',show:true},{id:'epargne',name:'Épargne',type:'epargne',ic:'sprout',show:true}];
+const DEFAULT_POCKETS=[{id:'courant',name:'Compte courant',type:'courant',ic:'wallet',show:true}];
 const pocketById=id=>((S&&S.pockets)||[]).find(p=>p.id===id);
 const pUpper=n=>String(n||'').toLocaleUpperCase('fr-FR');
 const pName=id=>{const p=pocketById(id);return p?pUpper(p.name):''};
@@ -649,7 +690,16 @@ const recLabel=r=>r.f==='custom'?`Tous les ${r.n} mois`:(REC.find(x=>x[0]===r.f)
 const KIND={ouverture:'Ajustement de solde',revenu:'Revenu',achat:'Achat',paiement:"Paiement d'échéance",depense:'Retrait',transfert:'Virement entre poches'};
 const NOTIF_TYPES=[['soon','Échéance bientôt'],['unpaid','Échéance à payer aujourd\u2019hui'],['late','Échéance en retard'],['credit','Crédits'],['daily','Question quotidienne sur les achats'],['goals',"Objectifs d'épargne"],['auto','Validation automatique'],['summary','Résumés semaine et mois'],['income','Revenus automatiques']];
 const AMBIANCES=[['doux','Piano doux'],['matin','Piano du matin'],['soir','Piano du soir']];
-const ACCENTS=[['peche','Pêche','#EBAA95'],['saumon','Saumon','#E89A84'],['poudre','Rose poudré','#E1ACAE']];
+/* Couleurs principales : [clé, nom, couleur, texte d'accent, texte sur la couleur] */
+const ACCENTS=[
+  ['saumon','Saumon','#E89A84','#7C4436','#2B2F2C'],['peche','Pêche','#EBAA95','#7A4B40','#2B2F2C'],
+  ['rouge','Rouge','#DD7063','#8E2F26','#221412'],['orange','Orange','#EE9B58','#8A4A12','#2B2F2C'],
+  ['jaune','Jaune','#E9C654','#735808','#2B2F2C'],['vert','Vert','#79BA89','#2F6B40','#1E2B22'],
+  ['menthe','Vert menthe','#7BCAB8','#25695B','#1C2B27'],['bleuclair','Bleu clair','#88C0E4','#2C5F80','#1B2733'],
+  ['bleu','Bleu','#4A73B8','#2E4F8A','#FFFFFF'],['violet','Violet','#7460AE','#54429A','#FFFFFF'],
+  ['rose','Rose','#EC98BD','#8A2F5A','#2B2F2C'],['poudre','Rose poudré','#E1ACAE','#7B4B52','#2B2F2C'],
+  ['bordeaux','Bordeaux','#8E3B4E','#7A2C3D','#FFFFFF'],['gris','Gris neutre','#A7ACB0','#4A5055','#2B2F2C']
+];
 const FX_SOUNDS=[['doux','Son doux'],['piano','Petit piano'],['goutte','Goutte'],['cloche','Cloche'],['aucun','Aucun son']];
 const DEFAULT_CATS=[
   {id:'logement',n:'Logement'},{id:'loyer',n:'Loyer',p:'logement'},{id:'energie',n:'Électricité et gaz',p:'logement'},{id:'eau',n:'Eau',p:'logement'},{id:'assur-hab',n:'Assurance habitation',p:'logement'},
@@ -661,14 +711,14 @@ const DEFAULT_CATS=[
   {id:'sante',n:'Santé'},{id:'mutuelle',n:'Mutuelle',p:'sante'},{id:'pharmacie',n:'Pharmacie et soins',p:'sante'},
   {id:'loisirs',n:'Loisirs'},{id:'sorties',n:'Sorties',p:'loisirs'},{id:'vacances',n:'Vacances',p:'loisirs'},{id:'shopping',n:'Shopping',p:'loisirs'},
   {id:'divers',n:'Divers'},{id:'autre',n:'Autre',p:'divers'},
-  {id:'revenus',n:'Revenus',rev:true},{id:'rev-salaire',n:'Salaire',p:'revenus'},{id:'rev-lfor',n:'LFOR LIVRAISON',p:'revenus'},{id:'rev-autre',n:'Autres revenus',p:'revenus'}
+  {id:'revenus',n:'Revenus',rev:true},{id:'rev-salaire',n:'Salaire',p:'revenus'},{id:'rev-autre',n:'Autres revenus',p:'revenus'}
 ];
 const BILL_SUGGEST=[['EDF','energie'],['Loyer','loyer'],['Assurance','assur-hab'],['Téléphone','telephone'],['Internet','internet'],['Impôts','impot-rev']];
 
 function defaultSettings(){
   return {name:'',theme:'auto',animations:true,validation:'manual',autoDelay:3,autoCustom:5,horizon:'month',payday:28,soonDays:3,dailyTime:'20:00',
     notif:{soon:true,unpaid:true,late:true,credit:true,daily:true,goals:true,auto:true,summary:true,income:true},privacyBlur:true,discreetStart:false,swipeTip:true,
-    accent:'peche',sound:'doux',soundVol:0.6,amb:{on:false,type:'doux',vol:0.4},
+    accent:'saumon',sound:'doux',soundVol:0.6,amb:{on:false,type:'doux',vol:0.6},
     pinHash:null,pinSalt:null,pinLen:4,bio:null,autolock:5};
 }
 function defaultState(){
@@ -683,7 +733,7 @@ function normalize(c){
   o.settings.amb=Object.assign(defaultSettings().amb,cs.amb||{});
   for(const k of ['bills','occ','goals','notifs','categories','pockets','recurring'])if(!Array.isArray(o[k])||(k==='pockets'&&!o[k].length))o[k]=defaultState()[k];
   if(!AMBIANCES.some(a=>a[0]===o.settings.amb.type))o.settings.amb.type='doux';
-  if(!ACCENTS.some(a=>a[0]===o.settings.accent))o.settings.accent='peche';
+  if(!ACCENTS.some(a=>a[0]===o.settings.accent))o.settings.accent='saumon';
   return o;
 }
 
@@ -748,17 +798,19 @@ const Store={
     try{
       const r=await this.fetchRemote();
       if(this.pending){for(const m of Object.keys(TX))this.months.add(m);this.core();return}
-      if(r.core&&r.at>(cacheAt||0)+1000){S=normalize(r.core);TX=r.tx;_all=null;this.saveCache(false);applyTheme();applyAnim();runChecks();softRender()}
+      if(U.viewing)return;
+      if(r.core&&r.at>(cacheAt||0)+1000){S=normalize(r.core);TX=r.tx;_all=null;migrate();this.saveCache(false);applyTheme();applyAnim();runChecks();softRender()}
     }catch(e){console.warn('sync',e)}
   },
-  core(){this.dirtyCore=true;this.schedule()},
-  month(m){this.months.add(m);this.schedule()},
+  readOnly:false,
+  core(){if(this.readOnly)return;this.dirtyCore=true;this.schedule()},
+  month(m){if(this.readOnly)return;this.months.add(m);this.schedule()},
   schedule(){
     clearTimeout(this.timer);this.timer=setTimeout(()=>this.flush(),600);
     if(this.mode==='supabase'){clearTimeout(this.cacheT);this.cacheT=setTimeout(()=>this.saveCache(true),150)}
   },
   async flush(){
-    if(this.busy)return;this.busy=true;
+    if(this.busy||this.readOnly)return;this.busy=true;
     try{
       while(this.dirtyCore||this.months.size){
         if(this.mode==='db'){
@@ -829,6 +881,22 @@ function catPath(id){const c=catById(id);if(!c)return 'Sans catégorie';const p=
 function catOptions(sel,rev=false){
   return S.categories.filter(c=>!c.p&&!!c.rev===!!rev).map(p=>`<optgroup label="${esc(p.n)}">${S.categories.filter(c=>c.p===p.id).map(c=>`<option value="${esc(c.id)}"${c.id===sel?' selected':''}>${esc(c.n)}</option>`).join('')}</optgroup>`).join('');
 }
+
+/* ---------- Mise à jour des données existantes : comptes plutôt que poches ---------- */
+function migrate(){
+  if((S.v|0)>=3)return;
+  const used=id=>allTx().some(t=>t.p===id)||S.bills.some(b=>!b.deleted&&b.pocket===id)||S.recurring.some(r=>r.pocket===id)||S.goals.some(g=>g.pocket===id);
+  const sal=S.pockets.find(p=>p.id==='salaire');
+  if(sal&&/^salaire$/i.test(sal.name.trim()))sal.name='Compte courant';
+  const lf=S.pockets.find(p=>p.id==='lfor');
+  if(lf&&/lfor/i.test(lf.name)&&!used('lfor'))S.pockets=S.pockets.filter(p=>p!==lf);
+  const ep=S.pockets.find(p=>p.id==='epargne');
+  if(ep&&/^épargne$/i.test(ep.name.trim()))ep.name='Compte épargne';
+  if(!allTx().some(t=>t.c==='rev-lfor'))S.categories=S.categories.filter(c=>c.id!=='rev-lfor');
+  if(!S.pockets.some(p=>!p.archived))S.pockets.push(clone(DEFAULT_POCKETS[0]));
+  S.v=3;Store.core();
+}
+const mainAccount=()=>courantPockets()[0]||activePockets()[0]||null;
 
 /* ---------- Échéances ---------- */
 const billById=id=>S.bills.find(b=>b.id===id);
@@ -984,6 +1052,7 @@ function creditRecurring(){
 function sysNotify(text){try{if(!('Notification' in window)||Notification.permission!=='granted'||!document.hidden)return;if(navigator.serviceWorker&&navigator.serviceWorker.controller){navigator.serviceWorker.ready.then(r=>r.showNotification('Sérénité',{body:text,icon:'icon-192.png'})).catch(()=>{});return}new Notification('Sérénité',{body:text})}catch(e){}}
 function runChecks(){
   if(!S)return;
+  if(U.viewing){generate();return}
   creditRecurring();
   generate();
   const t=today(),st=S.settings;
@@ -1141,7 +1210,7 @@ function dueMini(o){
 }
 function dueCard(o){
   const b=billById(o.billId),st=occState(o),todo=o.status==='todo';
-  const card=`<article class="ecard ${st.cls}" data-card="${o.id}"${todo?' data-swipe="1"':''}>
+  const card=`<article class="ecard ${st.cls}" data-card="${o.id}"${todo&&!U.viewing?' data-swipe="1"':''}>
     <button class="open" data-a="occ" data-id="${o.id}" aria-label="${esc(b.name)}, ${esc(money(o.amount))}, ${esc(st.chip.toLowerCase())}">
       <span class="row"><span class="nm">${esc(b.name)}</span><span class="chip-st ${st.cls}">${st.chip}</span></span>
       <span class="v" style="display:block">${money(o.amount)}</span>
@@ -1165,8 +1234,9 @@ function txIcon(t){
   if(t.c==='essence')return 'fuel';if(t.c==='resto')return 'cup';if(t.c==='courses')return 'cart';
   return TX_IC[t.k]||'tag';
 }
-function txRow(t){
-  const sub=[...new Set([pName(t.p),t.w].filter(Boolean))].join(', ')+(t.est?', estimé':'');
+function txRow(t,o={}){
+  const when=o.date?dayLabel(t.d):'';
+  const sub=[...new Set([pName(t.p),t.w,when].filter(Boolean))].join(', ')+(t.est?', estimé':'');
   const tone=t.k==='revenu'||(t.a>0&&isSaving(t.p))?'':'neutral';
   return `<button class="op" data-a="tx" data-id="${t.id}">${tileHTML(txIcon(t),'sm '+tone)}<span class="mid"><span class="nm">${esc(t.l||KIND[t.k])}</span><span class="s">${esc(sub)}</span></span><span class="amt${t.a>0?' in':''}">${signed(t.a)}</span></button>`;
 }
@@ -1193,27 +1263,29 @@ function dueSummary(){
 /* ---------- Accueil ---------- */
 function vHome(){
   const f=forecast(),h=new Date().getHours(),name=(S.settings.name||'').trim();
-  const hello=(h<5?'Bonne nuit':h<18?'Bonjour':'Bonsoir')+(name?' '+name:'');
-  const sum=dueSummary(),up=upcoming(3),urg=todoOcc().filter(isUrgent),urgTotal=urg.reduce((s,o)=>s+o.amount,0);
-  const shown=activePockets().filter(p=>p.show!==false);
-  const pc=p=>{const v=balance(p.id);return `<button class="pcard" data-go="pocket:${p.id}" style="view-transition-name:pk-${p.id}">${tileHTML(pIcon(p.id))}<span><span class="n pname">${esc(pName(p.id))}</span>${countHTML('bal:'+p.id,v,'v '+balCls(v))}</span></button>`};
+  const hello=U.viewing?`Comptes de ${U.viewing.name||'ton proche'}`:(h<5||h>=18?'Bonsoir':'Bonjour')+(name?' '+name:'');
+  const sum=dueSummary(),urg=todoOcc().filter(isUrgent),urgTotal=urg.reduce((s,o)=>s+o.amount,0);
+  const main=mainAccount(),mv=main?balance(main.id):0;
+  const others=activePockets().filter(p=>p!==main&&p.show!==false);
+  const recent=[];const seenLink=new Set();
+  for(const t of allTx()){if(t.link){if(seenLink.has(t.link))continue;seenLink.add(t.link);const pair=allTx().filter(x=>x.link===t.link);const src=pair.find(x=>x.a<0)||t;recent.push(src)}else recent.push(t);if(recent.length>=5)break}
+  const accRow=p=>{const v=balance(p.id);return `<button class="acc" data-go="pocket:${p.id}" style="view-transition-name:pk-${p.id}">${tileHTML(pIcon(p.id),'sm')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Compte courant'}</span></span><span class="amt ${balCls(v)}">${countHTML('bal:'+p.id,v)}</span></button>`};
   return `<header class="top" style="align-items:flex-start"><div class="hello"><p>${esc(cap(fLong.format(new Date())))}</p><h1>${esc(hello)}</h1></div>${bellBtn()}<button class="avatar" data-go="settings" aria-label="Profil et réglages">${initial()}</button></header>
-  <section class="hero enter" aria-label="Disponible réel">
+  <section class="hero enter" aria-label="Solde du compte principal">
     <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
-    <button class="bigbtn" data-a="discreet" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('dispo',f.dispo,'big '+(f.dispo<0?'neg':'pos'))}</button>
-    <span class="lbl">Disponible réel${U.discreet?', montants masqués':''}</span>
-    <span class="acct">Sur tes comptes : ${money(f.soldes)}${urgTotal?`, dont ${money(urgTotal)} à régler`:''}</span>
+    <span class="lbl-top pname">${main?`SOLDE ${esc(pName(main.id))}`:'SOLDE'}</span>
+    <button class="bigbtn" data-a="discreet" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('main',mv,'big '+balCls(mv))}</button>
+    <button class="dispo" data-a="forecast"><span>Disponible réel<small>après les échéances à venir</small></span><b>${money(f.dispo)}</b>${I.chev}</button>
     <span class="say"><i class="${sum.cls}"></i>${esc(sum.txt)}</span>
-    <button class="go" data-a="forecast" aria-label="Voir le détail du calcul">${I.chev}</button>
   </section>
   ${urg.length?`<button class="urgent-banner" data-go="bills:todo">${tileHTML('alert','bad')}<span class="mid"><b>${urg.length>1?'PAIEMENTS URGENTS':'PAIEMENT URGENT'}</b><span class="s">${urg.length>1?`${urg.length} à régler, ${money(urgTotal)} au total`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
-  ${incomeCards()}
-  <section class="blk" style="margin-bottom:6px"><div class="sec"><h2>Mes poches</h2><button class="more" data-go="pockets">Gérer</button></div><div class="swipe">${shown.map(pc).join('')||'<p class="empty">Aucune poche affichée. Choisis-les dans Mes poches.</p>'}</div></section>
-  <section class="blk"><div class="sec"><h2>Prochaines échéances</h2>${up.length?'<button class="more" data-go="bills">Tout voir</button>':''}</div>
-    ${up.length?`<div class="stack">${up.map(dueMini).join('')}</div>`:urg.length?'<p class="empty">Rien d\u2019autre à payer pour le moment.</p>':`<p class="empty">Rien à payer pour le moment. Ajoute ton loyer, EDF ou ton assurance pour ne plus rien oublier.<br><button class="btn soft" data-a="addBill">Ajouter une échéance</button></p>`}
+  ${U.viewing?'':incomeCards()}
+  ${U.viewing?'':`<nav class="qa" aria-label="Actions principales"><button data-a="income" data-id="${main?main.id:''}"><span>${I.arrowIn}</span>Ajouter de l'argent</button><button data-a="transfer"><span>${I.swap}</span>Transférer</button><button data-a="newPocket"><span>${I.plus}</span>Ajouter un compte</button></nav>`}
+  <section class="blk"><div class="sec"><h2>Comptes</h2><button class="more" data-go="pockets">Tout voir</button></div>
+    ${others.length?`<div class="list">${others.map(accRow).join('')}</div>`:`<p class="empty">Tu n'as qu'un compte pour l'instant. Ajoute un compte épargne, Vacances ou Voiture pour y mettre de l'argent de côté.</p>`}
   </section>
-  <section class="blk"><div class="sec"><h2>Mes objectifs</h2>${S.goals.length?`<button class="more" data-go="pocket:${goalPocket(S.goals[0])}">Tout voir</button>`:''}</div>
-    ${S.goals.length?`<div class="stack">${S.goals.slice(0,2).map(g=>goalCard(g,{compact:true})).join('')}</div>`:`<p class="empty">Crée un objectif, des vacances ou une voiture, et regarde la barre se remplir.<br><button class="btn soft" data-a="addGoal">Créer un objectif</button></p>`}
+  <section class="blk"><div class="sec"><h2>Dernières opérations</h2>${recent.length?'<button class="more" data-go="history">Tout voir</button>':''}</div>
+    ${recent.length?`<div class="list">${recent.map(t=>txRow(t,{date:true})).join('')}</div>`:'<p class="empty">Aucune opération pour l\u2019instant. Commence par « Ajouter de l\u2019argent ».</p>'}
   </section>`;
 }
 /* ---------- Échéances ---------- */
@@ -1255,55 +1327,57 @@ function vBills(){
 }
 /* ---------- Poches ---------- */
 function pocketActions(p){
-  if(p.type==='epargne')return `<button class="btn" data-a="saveMoney" data-id="to:${p.id}">Mettre de côté</button><button class="btn ghost" data-a="withdraw" data-id="${p.id}">Retirer</button>`;
-  return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter un revenu</button><button class="btn ghost" data-a="withdraw" data-id="${p.id}">Retirer</button>`;
+  if(p.type==='epargne')return `<button class="btn" data-a="transfer" data-id="from:${p.id}">Transférer</button><button class="btn ghost" data-a="saveMoney" data-id="to:${p.id}">Mettre de côté</button>`;
+  return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter de l'argent</button><button class="btn ghost" data-a="transfer" data-id="from:${p.id}">Transférer</button>`;
 }
 function vPockets(){
   const act=activePockets(),arch=S.pockets.filter(p=>p.archived);
   const total=act.reduce((s,p)=>s+balance(p.id),0);
   const card=p=>{
     const v=balance(p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id),un=p.type==='epargne'?Math.max(0,unallocated(p.id)):0;
-    const info=p.type==='epargne'?(goals.length?`<button class="linkish" data-go="pocket:${p.id}" style="min-height:32px;align-self:flex-start">${goals.length} objectif${goals.length>1?'s':''} en cours${un?`, ${money(un)} non affectés`:''}</button>`:'<p class="hint">Mets de l\u2019argent de côté, avec ou sans objectif.</p>'):(v===0&&!allTx().some(t=>t.p===p.id)?'<p class="hint">Ajoute chaque virement reçu : il rejoint ce solde.</p>':'');
-    return `<section class="pbig" style="view-transition-name:pk-${p.id}"><span class="head">${tileHTML(pIcon(p.id))}<span class="pname" style="flex:1">${esc(pName(p.id))}</span>${p.show===false?'<span class="s">Masquée de l\u2019accueil</span>':''}</span>
+    const info=p.type==='epargne'?(goals.length?`<button class="linkish" data-go="pocket:${p.id}" style="min-height:32px;align-self:flex-start">${goals.length} objectif${goals.length>1?'s':''} en cours${un?`, ${money(un)} non affectés`:''}</button>`:''):'';
+    return `<section class="pbig" style="view-transition-name:pk-${p.id}"><span class="head">${tileHTML(pIcon(p.id))}<span style="flex:1;display:flex;flex-direction:column"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Compte courant'}${p===mainAccount()?', compte principal':''}${p.show===false?', masqué de l\u2019accueil':''}</span></span></span>
       <button data-go="pocket:${p.id}" style="text-align:left">${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}</button>${info}
-      <div class="btns">${pocketActions(p)}</div>
+      ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}
       <button class="linkish" data-go="pocket:${p.id}" style="align-self:flex-start;min-height:36px">Voir les opérations →</button></section>`;
   };
-  return `${hdrMain('Mes poches',`${money(total)} au total`)}${act.map(card).join('')}
-  <button class="btn ghost wide" data-a="newPocket">+ Nouvelle poche</button>
-  ${arch.length?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
+  return `${hdrMain('Mes comptes',`${money(total)} au total`)}${act.map(card).join('')}
+  ${U.viewing?'':'<button class="btn ghost wide" data-a="newPocket">+ Ajouter un compte</button>'}
+  ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Comptes archivés</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
 }
 function vPocket(){
   const id=U.pocket,p=pocketById(id);
-  if(!p)return hdrSub('Poche')+'<p class="empty">Cette poche n\u2019existe plus.</p>';
+  if(!p)return hdrSub('Compte')+'<p class="empty">Ce compte n\u2019existe plus.</p>';
   const m=monthKey(today());
   const month=(TX[m]||[]).filter(t=>t.p===id&&t.k!=='ouverture');
   const inM=month.filter(t=>t.a>0).reduce((s,t)=>s+t.a,0),outM=-month.filter(t=>t.a<0).reduce((s,t)=>s+t.a,0);
   const items=allTx().filter(t=>t.p===id).slice(0,8),v=balance(id);
-  const acts=p.type==='epargne'?pocketActions(p):`<button class="btn" data-a="income" data-id="${id}">+ Ajouter un revenu</button><button class="btn ghost" data-a="addPurchase" data-id="${id}">Achat</button><button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`;
+  const acts=p.type==='epargne'
+    ?`<button class="btn" data-a="transfer" data-id="from:${id}">Transférer</button><button class="btn ghost" data-a="saveMoney" data-id="to:${id}">Mettre de côté</button><button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`
+    :`<button class="btn" data-a="income" data-id="${id}">+ Ajouter de l'argent</button><button class="btn ghost" data-a="transfer" data-id="from:${id}">Transférer</button><button class="btn ghost" data-a="addPurchase" data-id="${id}">Achat</button><button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`;
   let goals='';
   if(p.type==='epargne'){
     const gl=S.goals.filter(g=>goalPocket(g)===id),un=unallocated(id);
-    goals=`<section class="blk"><div class="sec"><h2>Mes objectifs</h2><button class="more" data-a="addGoal" data-id="${id}">+ Nouvel objectif</button></div>
+    goals=`<section class="blk"><div class="sec"><h2>Mes objectifs</h2>${U.viewing?'':`<button class="more" data-a="addGoal" data-id="${id}">+ Nouvel objectif</button>`}</div>
       ${gl.length?`<div class="stack">${gl.map(g=>goalCard(g)).join('')}</div>`:'<p class="empty">Crée ton premier objectif : vacances, voiture, coup dur…</p>'}
       ${un>0&&gl.length?`<p class="s" style="margin:12px 2px 0">${money(un)} d'épargne ne sont liés à aucun objectif.</p>`:''}</section>`;
   }
   let recs='';
   if(p.type!=='epargne'){
     const rl=S.recurring.filter(r=>r.pocket===id);
-    recs=`<section class="blk"><div class="sec"><h2>Revenus automatiques</h2><button class="more" data-a="addRecurring" data-id="${id}">+ Ajouter</button></div>
-      ${rl.length?`<div class="list">${rl.map(r=>{const nx=nextRecDate(r);return `<button class="op" data-a="editRecurring" data-id="${r.id}">${tileHTML('arrowIn','sm')}<span class="mid"><span class="nm">${esc(r.label)}</span><span class="s">${esc(recLabelTxt(r))}${r.paused?', en pause':nx?`, prochain le ${dShort(nx)}`:''}</span></span><span class="amt in">+${money(r.amount)}</span></button>`}).join('')}</div>`:'<p class="empty">Ton salaire peut être ajouté tout seul, à la date de ton choix. Tu corriges ensuite le montant réel.</p>'}</section>`;
+    recs=`<section class="blk"><div class="sec"><h2>Revenus automatiques</h2>${U.viewing?'':`<button class="more" data-a="addRecurring" data-id="${id}">+ Ajouter</button>`}</div>
+      ${rl.length?`<div class="list">${rl.map(r=>{const nx=nextRecDate(r);return `<button class="op" data-a="editRecurring" data-id="${r.id}">${tileHTML('arrowIn','sm')}<span class="mid"><span class="nm">${esc(r.label)}</span><span class="s">${esc(recLabelTxt(r))}${r.paused?', en pause':nx?`, prochain le ${dShort(nx)}`:''}</span></span><span class="amt in">+${money(r.amount)}</span></button>`}).join('')}</div>`:'<p class="empty">Ton salaire peut être ajouté tout seul sur ce compte, à la date de ton choix. Tu corriges ensuite le montant réel.</p>'}</section>`;
   }
   return `<div class="pdetail" style="view-transition-name:pk-${id}">
-    <div class="row1"><button class="round" data-a="back" aria-label="Retour">${I.back}</button><button class="round" data-a="editPocket" data-id="${id}" aria-label="Modifier la poche">${I.pencil}</button></div>
+    <div class="row1"><button class="round" data-a="back" aria-label="Retour">${I.back}</button>${U.viewing?tileHTML(pIcon(id)):`<button class="round" data-a="editPocket" data-id="${id}" aria-label="Modifier le compte">${I.pencil}</button>`}</div>
     <p class="name pname">${esc(pName(id))}</p>${countHTML('bal:'+id,v,'bal '+balCls(v))}
-    <div class="btns${p.type==='epargne'?'':' three'}">${acts}</div></div>
+    ${U.viewing?'':`<div class="btns four">${acts}</div>`}</div>
   <div class="duo"><div><span class="s">Entrées ce mois-ci</span><span class="v ${inM?'pos':''}">${signed(inM)}</span></div><div><span class="s">Sorties ce mois-ci</span><span class="v">${outM?'−'+money(outM):money(0)}</span></div></div>
   ${goals}${recs}
   <section class="blk"><div class="sec"><h2>Dernières opérations</h2></div>
-    ${items.length?`<div class="list">${items.map(txRow).join('')}</div><div class="center"><button class="linkish" data-go="history:p:${id}">Voir toutes les opérations →</button></div>`:'<p class="empty">Aucune opération sur cette poche pour le moment.</p>'}
+    ${items.length?`<div class="list">${items.map(t=>txRow(t)).join('')}</div><div class="center"><button class="linkish" data-go="history:p:${id}">Voir toutes les opérations →</button></div>`:'<p class="empty">Aucune opération sur ce compte pour le moment.</p>'}
   </section>
-  <div class="center" style="gap:18px"><button class="linkish" data-a="adjust" data-id="${id}" style="color:var(--ink-2);font-weight:500">Corriger le solde</button><button class="linkish" data-a="editPocket" data-id="${id}" style="color:var(--ink-2);font-weight:500">Modifier la poche</button></div>`;
+  ${U.viewing?'':`<div class="center" style="gap:18px"><button class="linkish" data-a="adjust" data-id="${id}" style="color:var(--ink-2);font-weight:500">Corriger le solde</button><button class="linkish" data-a="editPocket" data-id="${id}" style="color:var(--ink-2);font-weight:500">Modifier le compte</button></div>`}`;
 }
 /* ---------- Historique ---------- */
 const HF_BASE=[['all','Tout'],['revenus','Entrées'],['depenses','Sorties'],['paiements','Paiements'],['epargne','Épargne'],['retraits','Retraits']];
@@ -1371,7 +1445,7 @@ function anOverview(){
     :`<div class="period"><button class="round" data-a="anShift" data-id="-1" aria-label="Période précédente">${I.back}</button><p class="l">${esc(r.label)}</p><button class="round" data-a="anShift" data-id="1" aria-label="Période suivante">${I.chev}</button></div>`;
   let details='';
   if(U.anDetails){
-    const dayList=U.anMode==='day'?(()=>{const l=allTx().filter(t=>t.d===r.from);return `<div class="sec" style="margin-top:8px"><h2>Opérations du jour</h2></div>${l.length?`<div class="list">${l.map(txRow).join('')}</div>`:'<p class="empty">Aucune opération ce jour-là.</p>'}`})():'';
+    const dayList=U.anMode==='day'?(()=>{const l=allTx().filter(t=>t.d===r.from);return `<div class="sec" style="margin-top:8px"><h2>Opérations du jour</h2></div>${l.length?`<div class="list">${l.map(t=>txRow(t)).join('')}</div>`:'<p class="empty">Aucune opération ce jour-là.</p>'}`})():'';
     details=`<div class="enter"><div class="mcard">${pctRow('echeances',m.echeances,pm.echeances,prevLbl)}${pctRow('achats',m.achats,pm.achats,prevLbl)}${pctRow('net',m.net,pm.net,prevLbl)}<div class="pctrow"><div class="l"><span>Opérations</span><span class="evo flat mid">${m.count}</span></div></div></div>
       ${U.anMode!=='day'?barChart(buckets(U.anMode,r)):''}
       <div class="sec" style="margin-top:22px"><h2>Où part ton argent</h2></div>${breakdownHTML(r.from,r.to)}${dayList}</div>`;
@@ -1499,7 +1573,7 @@ const readForm=f=>{const o={};new FormData(f).forEach((v,k)=>o[k]=typeof v==='st
 function setErr(f,n,msg){const e=f.querySelector(`[data-err="${n}"]`);if(e)e.textContent=msg||'';return !msg}
 const pocketOpts=(except)=>activePockets().filter(p=>p.id!==except).map(p=>[p.id,pName(p.id)]);
 /* ---------- Achat ---------- */
-const QS=[['achat','Achat'],['revenu','Revenu'],['echeance','Échéance'],['epargne','Épargne']];
+const QS=[['achat','Achat'],['revenu','Argent'],['transfert','Virement'],['echeance','Échéance']];
 const qsHTML=cur=>`<div class="seg" role="tablist" aria-label="Que veux-tu ajouter ?" style="margin:0 0 16px">${QS.map(([k,l])=>`<button type="button" data-a="qs" data-id="${k}" aria-pressed="${k===cur}">${l}</button>`).join('')}</div>`;
 const CAT_WORDS=[[/mc ?do|mcdonald|burger|kfc|quick|resto|restaurant|pizza|kebab|sushi|tacos|brasserie|caf[eé]/i,'resto'],[/carrefour|leclerc|lidl|auchan|intermarch|super ?u|casino|monoprix|aldi|courses|march[eé]|boulang/i,'courses'],[/essence|carburant|gazole|diesel|station|total ?energ|esso|shell|bp\b/i,'essence'],[/pharma|m[eé]decin|docteur|dentiste/i,'pharmacie'],[/netflix|spotify|disney|deezer|prime video|canal/i,'streaming'],[/parking|p[eé]age|autoroute/i,'parking'],[/cin[eé]ma|bar\b|sortie|concert|bowling/i,'sorties'],[/zara|h&m|shopping|v[eê]tement|amazon|chaussure/i,'shopping'],[/garage|pneu|vidange|entretien|lavage/i,'entretien']];
 function guessCat(label){
@@ -1553,26 +1627,61 @@ function openDaily(){
 
 /* ---------- Revenus ---------- */
 function openIncome(pocket,t,o={}){
-  const pk=t?t.p:pocket;
-  const s=sheet(`${o.fab?qsHTML('revenu'):''}<h2>${t?'Modifier le revenu':'Ajouter un revenu'}</h2>${pk&&!t?`<p class="sub">Le montant s'ajoute au solde ${esc(pName(pk))}.</p>`:''}<form novalidate>
+  const pk=t?t.p:(pocket&&pocketById(pocket)&&!pocketById(pocket).archived?pocket:(mainAccount()||{}).id);
+  const s=sheet(`${o.fab?qsHTML('revenu'):''}<h2>${t?'Modifier l\u2019opération':'Ajouter de l\u2019argent'}</h2><p class="sub">Un revenu (salaire, virement reçu…) qui crédite le compte choisi.</p><form novalidate>
     ${F.money('amount','Montant',t?t.a:'',{big:true,auto:true})}
-    ${F.text('label','Motif ou source',t?t.l:'',{ph:'Ex. salaire de septembre, virement reçu'})}
-    ${pk?'':F.select('pocket','Sur quel solde',pocketOpts(),defaultPocket())}
-    <div class="two">${F.date('date','Date',t?t.d:today())}${F.cat('cat','Catégorie',t?t.c:(pk==='lfor'?'rev-lfor':pk==='salaire'||!pk?'rev-salaire':'rev-autre'),true)}</div>
-    <button class="btn block" type="submit">${t?'Enregistrer':'Ajouter le revenu'}</button>
+    ${F.text('label','Description',t?t.l:'',{ph:'Ex. Salaire, virement reçu'})}
+    ${F.select('pocket','Compte',pocketOpts(),pk)}
+    <div class="two">${F.date('date','Date',t?t.d:today())}${F.cat('cat','Catégorie',t?t.c:(catById('rev-salaire')?'rev-salaire':'rev-autre'),true)}</div>
+    <button class="btn block" type="submit">${t?'Enregistrer':'Ajouter'}</button>
     ${t?'':'<div class="center"><button type="button" class="linkish" data-rec>Programmer un revenu automatique →</button></div>'}</form>`);
   const f=s.querySelector('form');
-  const rb=s.querySelector('[data-rec]');if(rb)rb.onclick=()=>openRecurringForm(null,{pocket:pk||f.pocket.value,amount:parseMoney(f.amount.value)||'',label:f.label.value});
+  const rb=s.querySelector('[data-rec]');if(rb)rb.onclick=()=>openRecurringForm(null,{pocket:f.pocket.value,amount:parseMoney(f.amount.value)||'',label:f.label.value});
   f.addEventListener('submit',e=>{
     e.preventDefault();const d=readForm(f),a=parseMoney(d.amount);
-    const ok=setErr(f,'amount',a>0?'':'Indique un montant.')&setErr(f,'label',d.label?'':'Indique le motif ou la source.');
+    const ok=setErr(f,'amount',a>0?'':'Indique un montant.')&setErr(f,'label',d.label?'':'Indique une description, par exemple « Salaire ».');
     if(!ok)return;
-    const data={d:d.date||today(),a,p:pk||d.pocket,c:d.cat,l:d.label,est:undefined};
+    const data={d:d.date||today(),a,p:d.pocket,c:d.cat,l:d.label,est:undefined};
     if(t)updateTx(t.id,data);else addTx(Object.assign({k:'revenu'},data));
-    closeSheet();render();toast(t?'Revenu modifié.':`${money(a)} ajoutés à ${pName(data.p)}.`);
+    closeSheet();render();toast(t?'Opération modifiée.':`${money(a)} ajoutés sur ${pName(data.p)}.`);
   });
 }
 
+/* ---------- Transfert entre comptes ---------- */
+function openTransfer(arg,o={}){
+  const acc=activePockets();
+  if(acc.length<2){toast('Crée d\u2019abord un deuxième compte pour pouvoir transférer.');openPocketForm(null,{type:'epargne'});return}
+  let from=(arg&&arg.startsWith('from:'))?arg.slice(5):(mainAccount()||acc[0]).id;
+  let to=(arg&&arg.startsWith('to:'))?arg.slice(3):(acc.find(p=>p.id!==from&&p.type==='epargne')||acc.find(p=>p.id!==from)).id;
+  if(to===from)to=acc.find(p=>p.id!==from).id;
+  const opts=acc.map(p=>[p.id,`${pName(p.id)} (${money(balance(p.id))})`]);
+  const s=sheet(`${o.fab?qsHTML('transfert'):''}<h2>Transférer</h2><p class="sub">L'argent passe immédiatement d'un compte à l'autre.</p><form novalidate>
+    ${F.money('amount','Montant','',{big:true,auto:true})}
+    ${F.select('from','Depuis',opts,from)}
+    <div class="center" style="margin:-4px 0 10px"><button type="button" class="round" data-swap aria-label="Inverser les comptes">${I.swap}</button></div>
+    ${F.select('to','Vers',opts,to)}
+    <div data-goal></div>
+    ${F.text('label','Description (facultatif)','',{ph:'Ex. Épargne du mois'})}
+    ${F.date('date','Date')}
+    <p class="err" data-err="form"></p>
+    <button class="btn block" type="submit">Transférer</button></form>`);
+  const f=s.querySelector('form');
+  const goalSel=()=>{const gl=S.goals.filter(g=>goalPocket(g)===f.to.value);s.querySelector('[data-goal]').innerHTML=gl.length?F.select('goal','Vers un objectif (facultatif)',[['','Aucun objectif'],...gl.map(g=>[g.id,g.name])],''):''};
+  goalSel();f.to.addEventListener('change',goalSel);
+  s.querySelector('[data-swap]').onclick=()=>{const a=f.from.value;f.from.value=f.to.value;f.to.value=a;goalSel()};
+  f.addEventListener('submit',e=>{
+    e.preventDefault();const d=readForm(f),a=parseMoney(d.amount);
+    let ok=setErr(f,'amount',a>0?'':'Indique un montant.');
+    if(ok&&d.from===d.to)ok=setErr(f,'form','Choisis deux comptes différents.');
+    if(!ok)return;
+    const date=d.date||today(),link=uid(),g=d.goal?goalById(d.goal):null;
+    const lf=d.label||`Virement vers ${pName(d.to)}`,lt=d.label||`Virement depuis ${pName(d.from)}`;
+    addTx({d:date,a:-a,p:d.from,k:'transfert',l:lf,link});
+    addTx({d:date,a,p:d.to,k:'transfert',l:lt,g:g?g.id:undefined,link});
+    if(g)checkGoal(g);
+    closeSheet();render();toast(`${money(a)} transférés vers ${pName(d.to)}.`);
+  });
+}
 /* ---------- Retrait (motif obligatoire) ---------- */
 function openWithdraw(pocket,o={}){
   const isE=isSaving(pocket),goals=S.goals.filter(g=>goalPocket(g)===pocket);
@@ -1604,7 +1713,7 @@ function openWithdraw(pocket,o={}){
 /* ---------- Mettre de côté ---------- */
 function openSave(arg,o={}){
   const sp=savingPockets();
-  if(!sp.length){toast('Crée d\u2019abord une poche de type épargne.');openPocketForm(null,{type:'epargne'});return}
+  if(!sp.length){toast('Crée d\u2019abord un compte de type épargne.');openPocketForm(null,{type:'epargne'});return}
   let goalId='',to=sp[0].id;
   if(arg&&arg.startsWith('to:'))to=arg.slice(3);else if(arg){const g0=goalById(arg);if(g0){goalId=arg;to=goalPocket(g0)}}
   const unFor=pid=>Math.max(0,unallocated(pid));
@@ -1621,13 +1730,13 @@ function openSave(arg,o={}){
   f.addEventListener('submit',e=>{
     e.preventDefault();const d=readForm(f),a=parseMoney(d.amount);
     let ok=setErr(f,'amount',a>0?'':'Indique un montant.');
-    if(ok&&!d.src)ok=setErr(f,'amount','Crée d\u2019abord une poche d\u2019où prendre l\u2019argent.');
+    if(ok&&!d.src)ok=setErr(f,'amount','Crée d\u2019abord un compte d\u2019où prendre l\u2019argent.');
     const g=d.goal?goalById(d.goal):null,dest=g?goalPocket(g):(d.dest||to);
     let from=d.src;
     if(ok&&from&&from.startsWith('un:')){
       from=from.slice(3);
       if(!g)ok=setErr(f,'amount','Choisis l\u2019objectif qui reçoit cette épargne.');
-      else if(goalPocket(g)!==from)ok=setErr(f,'amount','Choisis un objectif de cette même poche.');
+      else if(goalPocket(g)!==from)ok=setErr(f,'amount','Choisis un objectif de ce même compte.');
       else if(a>unFor(from))ok=setErr(f,'amount',`Il y a ${money(unFor(from))} non affectés.`);
     }
     if(!ok)return;
@@ -1641,13 +1750,13 @@ function openSave(arg,o={}){
 /* ---------- Objectifs ---------- */
 function openGoalForm(g,pocketHint){
   const sp=savingPockets();
-  if(!g&&!sp.length){toast('Crée d\u2019abord une poche de type épargne pour y ranger tes objectifs.');openPocketForm(null,{type:'epargne'});return}
+  if(!g&&!sp.length){toast('Crée d\u2019abord un compte de type épargne pour y ranger tes objectifs.');openPocketForm(null,{type:'epargne'});return}
   const cur=g?goalPocket(g):(pocketHint&&isSaving(pocketHint)?pocketHint:sp[0].id);
   const s=sheet(`<h2>${g?"Modifier l'objectif":'Nouvel objectif'}</h2><form novalidate>
     ${F.text('name','Nom',g?g.name:'',{ph:'Ex. Vacances',auto:true})}
     ${F.money('target','Montant cible',g?g.target:'')}
-    ${sp.length>1?F.select('pocket','Dans la poche',sp.map(p=>[p.id,pName(p.id)]),cur):''}
-    ${g?'':F.money('initial','Déjà mis de côté (facultatif)','')+'<p class="hint">Pris d\u2019abord sur l\u2019épargne non affectée de la poche, le reste est ajouté à son solde.</p>'}
+    ${sp.length>1?F.select('pocket','Dans le compte',sp.map(p=>[p.id,pName(p.id)]),cur):''}
+    ${g?'':F.money('initial','Déjà mis de côté (facultatif)','')+'<p class="hint">Pris d\u2019abord sur l\u2019épargne non affectée du compte, le reste est ajouté à son solde.</p>'}
     <div class="two">${F.date('date','Date cible (facultatif)',g?g.date||'':'')}${F.money('monthly','Versement prévu / mois',g&&g.monthly?g.monthly:'')}</div>
     <p class="hint">Le versement prévu est déduit de ton disponible réel chaque mois, jusqu'à ce qu'il soit fait.</p>
     <button class="btn block" type="submit">${g?'Enregistrer':"Créer l'objectif"}</button></form>`);
@@ -1681,7 +1790,7 @@ function openGoal(id){
   const s=sheet(`<h2>${esc(g.name)}</h2><div class="sheet-amt">${fmtPct(pct)}</div>${barHTML('sheet'+g.id,pct,done)}
     <p class="t num" style="margin:10px 0 2px">${money(saved)} / ${money(g.target)}</p>${done?`<p style="margin:0 0 8px"><span class="reached">${I.check}Objectif atteint</span></p>`:`<p class="s" style="margin:0 0 8px">Reste ${money(rest)}</p>`}${tips}
     <div class="actions"><button class="btn" data-a="saveMoney" data-id="${g.id}">Verser</button><button class="btn ghost" data-w>Retirer</button></div>
-    ${moves.length?`<h3 class="grp">Derniers mouvements</h3><div class="list">${moves.map(txRow).join('')}</div>`:''}
+    ${moves.length?`<h3 class="grp">Derniers mouvements</h3><div class="list">${moves.map(t=>txRow(t)).join('')}</div>`:''}
     <div class="actions"><button class="btn ghost" data-e>Modifier</button><button class="btn quiet" data-d>Supprimer</button></div>`);
   s.querySelector('[data-w]').onclick=()=>openWithdraw(goalPocket(g),{goal:g.id});
   s.querySelector('[data-e]').onclick=()=>openGoalForm(g);
@@ -1835,7 +1944,7 @@ function openAdjust(pocket){
 }
 function openOnboarding(){
   const ps=activePockets();
-  const s=sheet(`<h2>Bienvenue dans Sérénité</h2><p class="sub">Dis-moi comment t'appeler, puis indique ce que tu as aujourd'hui sur chaque poche. Tu pourras tout corriger, renommer ou ajouter des poches plus tard.</p><form novalidate>
+  const s=sheet(`<h2>Bienvenue dans Sérénité</h2><p class="sub">Dis-moi comment t'appeler, puis indique le solde actuel de ton compte. Tu pourras ajouter d\u2019autres comptes (épargne, vacances…) quand tu veux.</p><form novalidate>
     ${F.text('name','Ton prénom',S.settings.name||'',{ph:'Facultatif'})}
     ${ps.map(p=>F.money('p_'+p.id,pName(p.id),'')).join('')}
     <button class="btn block" type="submit">Commencer</button><button class="btn ghost block mt" type="button" data-skip>Passer, je le ferai plus tard</button>
@@ -1891,60 +2000,61 @@ function openLater(o){
 function openPocketForm(p,o={}){
   const isNew=!p,type=p?p.type:(o.type||'courant');
   let ic=p?pIcon(p.id):(type==='epargne'?'sprout':'wallet');
-  const s=sheet(`<h2>${isNew?'Nouvelle poche':'Modifier la poche'}</h2><form novalidate>
-    ${F.text('name','Nom',p?p.name:'',{ph:'Ex. Entreprise, Vacances, Voiture',auto:true})}
+  const s=sheet(`<h2>${isNew?'Nouveau compte':'Modifier le compte'}</h2><form novalidate>
+    ${F.text('name','Nom',p?p.name:'',{ph:'Ex. Compte épargne, Uber, Vacances',auto:true})}
     <p class="hint">Il s'affichera toujours en majuscules${p?`, comme ici : ${esc(pName(p.id))}`:''}.</p>
-    <div class="seg" role="radiogroup" aria-label="Type de poche" style="margin-bottom:8px"><button type="button" data-type="courant" aria-pressed="${type!=='epargne'}">Courante</button><button type="button" data-type="epargne" aria-pressed="${type==='epargne'}">Épargne</button></div>
+    <div class="seg" role="radiogroup" aria-label="Type de compte" style="margin-bottom:8px"><button type="button" data-type="courant" aria-pressed="${type!=='epargne'}">Courante</button><button type="button" data-type="epargne" aria-pressed="${type==='epargne'}">Épargne</button></div>
     <p class="hint" data-typehint style="margin:0 0 16px"></p>
     <span class="s" style="display:block;margin-bottom:8px">Icône</span>
     <div class="icon-pick">${POCKET_ICONS.map(k=>`<button type="button" data-ic="${k}" aria-pressed="${k===ic}" aria-label="Icône ${k}">${I[k]}</button>`).join('')}</div>
     <label class="check"><input type="checkbox" name="show" ${!p||p.show!==false?'checked':''}><span>Afficher sur l'accueil</span></label>
     ${isNew?F.money('start','Solde de départ (facultatif)',''):''}
-    <button class="btn block" type="submit">${isNew?'Créer la poche':'Enregistrer'}</button>
-    ${isNew?'':'<button class="btn quiet block mt" type="button" data-archive>Archiver cette poche</button>'}
+    <button class="btn block" type="submit">${isNew?'Créer le compte':'Enregistrer'}</button>
+    ${isNew?'':'<button class="btn quiet block mt" type="button" data-archive>Archiver ce compte</button>'}
   </form>`);
   const f=s.querySelector('form');let curType=type;
-  const hint=()=>{s.querySelector('[data-typehint]').textContent=curType==='epargne'?'Une poche épargne peut contenir des objectifs. Elle n\u2019est pas comptée dans ton disponible réel.':'Une poche courante est comptée dans ton disponible réel.'};hint();
-  s.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{curType=b.dataset.type;s.querySelectorAll('[data-type]').forEach(x=>x.setAttribute('aria-pressed',x===b));hint()});
-  s.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{ic=b.dataset.ic;s.querySelectorAll('[data-ic]').forEach(x=>x.setAttribute('aria-pressed',x===b))});
+  const hint=()=>{s.querySelector('[data-typehint]').textContent=curType==='epargne'?'Un compte épargne peut contenir des objectifs. Il n\u2019est pas compté dans ton disponible réel.':'Un compte courant est compté dans ton disponible réel.'};hint();
+  let icTouched=!!p;const pickIc=k=>{ic=k;s.querySelectorAll('[data-ic]').forEach(x=>x.setAttribute('aria-pressed',x.dataset.ic===k))};
+  s.querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{curType=b.dataset.type;s.querySelectorAll('[data-type]').forEach(x=>x.setAttribute('aria-pressed',x===b));hint();if(!icTouched)pickIc(curType==='epargne'?'sprout':'wallet')});
+  s.querySelectorAll('[data-ic]').forEach(b=>b.onclick=()=>{icTouched=true;pickIc(b.dataset.ic)});
   f.addEventListener('submit',e=>{
     e.preventDefault();const d=readForm(f),name=(d.name||'').trim().slice(0,30);
-    if(!setErr(f,'name',name?'':'Donne un nom à ta poche.'))return;
-    if(activePockets().some(x=>x!==p&&pUpper(x.name)===pUpper(name))){setErr(f,'name','Une poche porte déjà ce nom.');return}
-    if(p&&p.type==='epargne'&&curType!=='epargne'&&S.goals.some(g=>goalPocket(g)===p.id)){setErr(f,'name','Cette poche contient des objectifs : déplace-les avant de la passer en courante.');return}
+    if(!setErr(f,'name',name?'':'Donne un nom à ton compte.'))return;
+    if(activePockets().some(x=>x!==p&&pUpper(x.name)===pUpper(name))){setErr(f,'name','Un compte porte déjà ce nom.');return}
+    if(p&&p.type==='epargne'&&curType!=='epargne'&&S.goals.some(g=>goalPocket(g)===p.id)){setErr(f,'name','Ce compte contient des objectifs : déplace-les avant de le passer en compte courant.');return}
     if(isNew){
       const start=d.start?parseMoney(d.start,true):0;
       if(isNaN(start)){setErr(f,'start','Montant invalide.');return}
       const np={id:'p-'+uid(),name,type:curType,ic,show:!!d.show};S.pockets.push(np);
       if(start)addTx({d:today(),a:start,p:np.id,k:'ouverture',l:'Solde de départ'});
-      Store.core();closeSheet();render();toast(`Poche ${pUpper(name)} créée.`);
+      Store.core();closeSheet();render();toast(`Compte ${pUpper(name)} créé.`);
     }else{
-      Object.assign(p,{name,type:curType,ic,show:!!d.show});Store.core();closeSheet();render();toast('Poche enregistrée.');
+      Object.assign(p,{name,type:curType,ic,show:!!d.show});Store.core();closeSheet();render();toast('Compte enregistré.');
     }
   });
   const ar=s.querySelector('[data-archive]');if(ar)ar.onclick=()=>openArchive(p);
 }
 function openArchive(p){
   const others=activePockets().filter(x=>x.id!==p.id);
-  if(!others.length){toast('Garde au moins une poche active.');return}
+  if(!others.length){toast('Garde au moins un compte actif.');return}
   const v=balance(p.id),bills=S.bills.filter(b=>!b.deleted&&b.pocket===p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id);
   const needDest=v!==0||bills.length||goals.length;
   const destOpts=(goals.length?others.filter(x=>x.type==='epargne'):others).map(x=>[x.id,pName(x.id)]);
-  if(needDest&&!destOpts.length){toast('Crée d\u2019abord une autre poche épargne pour y déplacer les objectifs.');return}
+  if(needDest&&!destOpts.length){toast('Crée d\u2019abord un autre compte épargne pour y déplacer les objectifs.');return}
   const lines=[v?`son solde de ${money(v)}`:'',bills.length?`${bills.length} échéance${bills.length>1?'s':''}`:'',goals.length?`${goals.length} objectif${goals.length>1?'s':''}`:''].filter(Boolean);
-  const s=sheet(`<h2>Archiver ${esc(pName(p.id))}</h2><p class="sub">Elle disparaît de tes écrans, mais son historique est conservé. Tu pourras la restaurer.</p><form novalidate>
-    ${needDest?`<p class="hint" style="margin:0 0 12px">Avant d'archiver, on déplace ${lines.join(', ')} vers une autre poche.</p>${F.select('dest','Vers',destOpts,destOpts[0][0])}`:''}
+  const s=sheet(`<h2>Archiver ${esc(pName(p.id))}</h2><p class="sub">Il disparaît de tes écrans, mais son historique est conservé. Tu pourras le restaurer.</p><form novalidate>
+    ${needDest?`<p class="hint" style="margin:0 0 12px">Avant d'archiver, on déplace ${lines.join(', ')} vers un autre compte.</p>${F.select('dest','Vers',destOpts,destOpts[0][0])}`:''}
     <button class="btn block" type="submit">Archiver</button></form>`);
   s.querySelector('form').addEventListener('submit',e=>{
     e.preventDefault();const dest=needDest?s.querySelector('[name=dest]').value:null;
     if(dest){
-      for(const g of goals){const saved=goalSaved(g.id);if(saved){const link=uid();addTx({d:today(),a:-saved,p:p.id,k:'transfert',l:'Poche archivée : '+g.name,g:g.id,link});addTx({d:today(),a:saved,p:dest,k:'transfert',l:'Poche archivée : '+g.name,g:g.id,link})}g.pocket=dest}
-      const rest=balance(p.id);if(rest){const link=uid();addTx({d:today(),a:-rest,p:p.id,k:'transfert',l:'Poche archivée',link});addTx({d:today(),a:rest,p:dest,k:'transfert',l:'Poche archivée',link})}
+      for(const g of goals){const saved=goalSaved(g.id);if(saved){const link=uid();addTx({d:today(),a:-saved,p:p.id,k:'transfert',l:'Compte archivé : '+g.name,g:g.id,link});addTx({d:today(),a:saved,p:dest,k:'transfert',l:'Compte archivé : '+g.name,g:g.id,link})}g.pocket=dest}
+      const rest=balance(p.id);if(rest){const link=uid();addTx({d:today(),a:-rest,p:p.id,k:'transfert',l:'Compte archivé',link});addTx({d:today(),a:rest,p:dest,k:'transfert',l:'Compte archivé',link})}
       bills.forEach(b=>b.pocket=dest);
     }
     p.archived=true;Store.core();closeSheet();
     if(U.view==='pocket'&&U.pocket===p.id){U.view='pockets';U.stack=[]}
-    render();toast(`${pName(p.id)} est archivée.`);
+    render();toast(`${pName(p.id)} est archivé.`);
   });
 }
 
@@ -1961,13 +2071,13 @@ function maskMoney(root){
 /* ---------- Revenu automatique ---------- */
 function openRecurringForm(r,o={}){
   const cps=courantPockets();
-  if(!cps.length){toast('Crée d\u2019abord une poche courante.');return}
+  if(!cps.length){toast('Crée d\u2019abord un compte courant.');return}
   const x=r||{label:o.label||'Salaire',amount:o.amount||'',pocket:(o.pocket&&!isSaving(o.pocket)?o.pocket:cps[0].id),freq:'monthly',day:Math.min(28,parseISO(today()).getDate()),weekday:5,start:today(),weekend:true,cat:'rev-salaire'};
   const days=Array.from({length:31},(_,i)=>[i+1,'Le '+(i+1)]),wds=[[1,'Lundi'],[2,'Mardi'],[3,'Mercredi'],[4,'Jeudi'],[5,'Vendredi'],[6,'Samedi'],[0,'Dimanche']];
   const s=sheet(`<h2>${r?'Revenu automatique':'Nouveau revenu automatique'}</h2><p class="sub">Le montant est ajouté tout seul à la date prévue, en « estimé ». Tu confirmes ou tu corriges ensuite le montant réel.</p><form novalidate>
     ${F.text('label','Nom',x.label,{ph:'Ex. Salaire'})}
     ${F.money('amount','Montant prévu',x.amount)}
-    ${F.select('pocket','Sur la poche',cps.map(p=>[p.id,pName(p.id)]),x.pocket)}
+    ${F.select('pocket','Sur le compte',cps.map(p=>[p.id,pName(p.id)]),x.pocket)}
     ${F.select('freq','Fréquence',[['monthly','Chaque mois'],['weekly','Chaque semaine'],['biweekly','Toutes les 2 semaines']],x.freq)}
     <div data-m>${F.select('day','Jour du mois',days,x.day)}<label class="check"><input type="checkbox" name="weekend" ${x.weekend?'checked':''}><span>Si ce jour tombe un week-end, créditer le vendredi d'avant</span></label></div>
     <div data-w>${F.select('weekday','Jour de la semaine',wds,x.weekday)}</div>
@@ -2008,8 +2118,9 @@ function openConfirmIncome(id){
 }
 
 /* ---------- Réglages ---------- */
-const SET_CATS={notif:['Notifications','bell'],pay:['Paiements','card'],amb:['Ambiance','music'],sec:['Sécurité','shield'],share:['Partage','users'],look:['Apparence','contrast'],data:['Données','data']};
+const SET_CATS={notif:['Notifications','bell'],pay:['Paiements','card'],amb:['Ambiance','music'],sec:['Sécurité','shield'],share:['Gestion des accès','users'],look:['Apparence','contrast'],data:['Données','data']};
 function vSettings(){
+  if(U.viewing)return `${hdrSub('Réglages')}<div class="sgroup" style="padding:18px"><p style="margin:0 0 14px">Tu consultes les comptes de <b>${esc(U.viewing.name||'ton proche')}</b> en lecture seule. Tu ne peux rien modifier.</p><button class="btn wide" data-a="exitView">Revenir à mon compte</button></div>`;
   const st=S.settings,c=U.setCat;
   const sel=(path,opts,val,label)=>`<select data-set="${path}" aria-label="${esc(label)}">${opts.map(([v,l])=>`<option value="${esc(v)}"${String(v)===String(val)?' selected':''}>${esc(l)}</option>`).join('')}</select>`;
   const sw=(path,val,label,dis)=>`<button class="sw" role="switch" aria-checked="${!!val}" aria-label="${esc(label)}" data-toggle="${path}"${dis?' disabled':''}></button>`;
@@ -2024,7 +2135,7 @@ function vSettings(){
     return `${hdrSub('Réglages')}
     <button class="profile" data-a="profile"><span class="avatar">${initial()}</span><span><b>${esc(name||'Ton prénom')}</b><span class="s">Compte privé</span></span></button>
     ${grp(nav('notif',`Rappels ${st.soonDays} j avant, ${fxName.toLowerCase()}, question à ${st.dailyTime.replace(/^0/,'').replace(':00',' h').replace(':',' h ')}`)+nav('pay',st.validation==='auto'?`Validation automatique après ${autoDelayDays()} jour${autoDelayDays()>1?'s':''}`:'Validation manuelle')+nav('amb',st.amb.on?`${ambName}, activée`:'Désactivée'))}
-    ${grp(nav('sec',hasPin?`Code PIN${st.bio?', Face ID':''}, verrouillage ${+st.autolock?`après ${st.autolock} min`:'à l’ouverture'}`:'Aucun code pour l’instant')+nav('share','Compte privé, aucune demande'))}
+    ${grp(nav('sec',hasPin?`Code PIN${st.bio?', Face ID':''}, verrouillage ${+st.autolock?`après ${st.autolock} min`:'à l’ouverture'}`:'Aucun code pour l’instant')+nav('share',Store.mode==='supabase'?'Autoriser une personne à consulter tes comptes':'Disponible dans la version en ligne'))}
     ${grp(nav('look',`${{auto:'Automatique',light:'Clair',dark:'Sombre'}[st.theme]}, animations ${st.animations?'activées':'désactivées'}`)+nav('data','Export, sauvegarde, catégories'))}
     <p class="s" style="margin:6px 4px 0">${Store.mode==='supabase'?'Tes données sont enregistrées dans ton compte Sérénité, séparées de celles des autres utilisateurs.':Store.mode==='db'?'Tes données sont enregistrées dans ton compte et restent privées.':'Tes données sont enregistrées sur cet appareil.'}</p>`;
   }
@@ -2041,11 +2152,11 @@ function vSettings(){
       +(st.validation==='auto'&&st.autoDelay==='custom'?row('Nombre de jours',`<input type="number" min="1" max="60" data-set="autoCustom" value="${st.autoCustom}" aria-label="Nombre de jours">`):''))}
     <h3 class="grp">Disponible réel</h3>${grp(row('Calculé jusqu\u2019à',sel('horizon',[['month','La fin du mois'],['payday','La prochaine paie']],st.horizon,'Période de calcul'))+(st.horizon==='payday'?(S.recurring.some(x=>!x.paused&&x.freq==='monthly'&&!isSaving(x.pocket))?row('Jour de paie','',`Le ${paydayDay()}, d\u2019après ton revenu automatique`):row('Jour de paie',sel('payday',Array.from({length:31},(_,i)=>[i+1,'Le '+(i+1)]),st.payday,'Jour de paie'))):''))}`;
   }else if(c==='amb'){
-    body=`${grp(row('Musique d\u2019ambiance',sw('amb.on',st.amb.on,'Musique d\u2019ambiance'),st.amb.on?`${ambName}, en lecture`:'Désactivée'))}
+    body=`${grp(row('Son d\u2019ambiance',sw('amb.on',st.amb.on,'Son d\u2019ambiance'),st.amb.on?`${ambName}, en lecture`:'Désactivé. Active-le pour l\u2019entendre : il démarre au premier toucher de l\u2019écran.'))}
     <h3 class="grp">Choisis ton ambiance</h3>
     <div class="amb-grid" role="radiogroup" aria-label="Ambiance">${AMBIANCES.map(([k,l])=>{const on=st.amb.type===k;return `<button class="amb" role="radio" aria-checked="${on}" data-a="ambPick" data-id="${k}"><span class="top-r">${tileHTML(AMB_IC[k])}${on&&st.amb.on?'<span class="eq" aria-hidden="true"><i></i><i></i><i></i></span>':''}</span><span class="t">${esc(l)}</span></button>`}).join('')}</div>
-    ${grp(row('Volume',`<input type="range" min="0" max="100" data-set="amb.vol" value="${Math.round(st.amb.vol*100)}" aria-label="Volume de la musique">`))}
-    <p class="s" style="margin:10px 4px 0">Quelques notes de piano espacées, créées par l'appli (aucun fichier soumis à des droits). Indépendant des sons de notification.</p>`;
+    ${grp(row('Volume',`<input type="range" min="0" max="100" data-set="amb.vol" value="${Math.round(st.amb.vol*100)}" aria-label="Volume du son d\u2019ambiance">`)+row('Essayer','<button class="mini" data-a="ambTest">Écouter</button>','Joue quelques notes tout de suite'))}
+    <p class="s" style="margin:10px 4px 0">Quelques notes de piano espacées, créées directement par l'appli : il n'y a aucun fichier à charger, et aucun droit d'auteur. Sur iPhone, le son fonctionne même en mode silencieux, mais il s'arrête quand l'appli passe en arrière-plan.</p>`;
   }else if(c==='sec'){
     body=`${grp(row('Code PIN',`<button class="mini" data-a="pin">${hasPin?'Modifier':'Activer'}</button>`,hasPin?'Demandé à chaque ouverture':'Désactivé')
       +(bioOk?row('Face ID / Touch ID',sw('bio',!!st.bio,'Face ID ou Touch ID',!hasPin),hasPin?'Pour déverrouiller sans taper le code':'Active d\u2019abord un code PIN'):'')
@@ -2054,9 +2165,13 @@ function vSettings(){
     <h3 class="grp">Confidentialité</h3>${grp(row('Flouter en arrière-plan',sw('privacyBlur',st.privacyBlur,'Flouter en arrière-plan'),'Quand tu changes d\u2019appli. Sur iPhone, iOS ne le garantit pas toujours.')+row('Mode discret à l\u2019ouverture',sw('discreetStart',st.discreetStart,'Mode discret à l\u2019ouverture'),'Les montants sont masqués. Touche le grand montant de l\u2019accueil pour les afficher.'))}
     ${Store.mode==='supabase'&&ACCOUNT?`<h3 class="grp">Ton compte</h3>${grp(row('Connecté avec','',esc(ACCOUNT.email||''))+row('Changer de mot de passe','<button class="mini" data-a="changePass">Changer</button>')+row('Se déconnecter','<button class="mini" data-a="logout">Déconnexion</button>','Sur ce téléphone')+row('Tous mes appareils','<button class="mini" data-a="logoutAll">Déconnecter</button>','Ferme la session partout'))}${grp(row('Supprimer mon compte','<button class="mini" data-a="deleteAccount" style="color:var(--bad)">Supprimer</button>','Efface définitivement toutes tes données'))}`:grp(row('Connexion et sessions','','Tes données sont protégées par ton compte Claude dans cette version.'))}`;
   }else if(c==='share'){
-    body=`${grp(row('Compte privé','','Par défaut, personne ne voit tes données.')+row('Demandes d\u2019accès','','Aucune demande en attente.')+row('Accès de ta compagne','','Demande, autorisation en lecture seule et retrait de l\u2019accès arrivent à la prochaine étape.'))}`;
+    body=shareSettingsHTML(grp,row);
   }else if(c==='look'){
-    body=`${grp(row('Thème',sel('theme',[['auto','Automatique'],['light','Clair'],['dark','Sombre']],st.theme,'Thème'))+row('Nuance de rose',`<div class="swatches" role="group" aria-label="Nuance">${ACCENTS.map(([k,l,hex])=>`<button class="swatch" data-a="accentPick" data-id="${k}" aria-pressed="${st.accent===k}" aria-label="${esc(l)}" style="background:${hex}"></button>`).join('')}</div>`,esc((ACCENTS.find(a=>a[0]===st.accent)||ACCENTS[0])[1]))+row('Animations',sw('animations',st.animations,'Animations'),'Transitions, barres qui se remplissent, ondes'))}`;
+    const curA=ACCENTS.find(a=>a[0]===st.accent)||ACCENTS[0];
+    body=`${grp(row('Thème',sel('theme',[['auto','Automatique'],['light','Clair'],['dark','Sombre']],st.theme,'Thème'))+row('Animations',sw('animations',st.animations,'Animations'),'Transitions, barres qui se remplissent, ondes'))}
+    <h3 class="grp">Couleur principale : ${esc(curA[1])}</h3>
+    <div class="sgroup" style="padding:16px"><div class="swatch-grid" role="radiogroup" aria-label="Couleur principale">${ACCENTS.map(([k,l,hex])=>`<button class="swatch-b" role="radio" data-a="accentPick" data-id="${k}" aria-checked="${st.accent===k}"><span class="swatch" style="background:${hex}"></span><span>${esc(l)}</span></button>`).join('')}</div></div>
+    <p class="s" style="margin:10px 4px 0">Les couleurs d'état restent fixes : vert pour ce qui va bien, rouge pour les retards et les baisses.</p>`;
   }else if(c==='data'){
     body=`${grp(row('Historique au format CSV','<button class="mini" data-a="csv">Exporter</button>','Pour Excel ou Google Sheets')+row('Relevé PDF','<button class="mini" data-a="pdf">Créer</button>')+row('Sauvegarde complète','<button class="mini" data-a="backup">Sauvegarder</button>','Un fichier à garder en lieu sûr')+row('Restaurer une sauvegarde','<button class="mini" data-a="restore">Restaurer</button>'))}
     ${grp(row('Catégories et sous-catégories','<button class="mini" data-a="cats">Gérer</button>'))}
@@ -2079,11 +2194,24 @@ function applySetting(p){
   if(p==='sound')Sound.fx(st.sound);
   if(p==='horizon'||p==='payday'||p==='validation'||p==='autoDelay'||p==='autoCustom')runChecks();
 }
+function hexRgb(h){h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
+function mixHex(a,b,t){const x=hexRgb(a),y=hexRgb(b);return '#'+x.map((v,i)=>Math.round(v*(1-t)+y[i]*t).toString(16).padStart(2,'0')).join('')}
+function lum(h){const [r,g,b]=hexRgb(h).map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4)});return 0.2126*r+0.7152*g+0.0722*b}
 function applyTheme(){
   const t=S.settings.theme,r=document.documentElement;
   if(t==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',t);
-  if(S.settings.accent&&S.settings.accent!=='peche')r.setAttribute('data-accent',S.settings.accent);else r.removeAttribute('data-accent');
+  r.removeAttribute('data-accent');
   const dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);
+  const a=ACCENTS.find(x=>x[0]===S.settings.accent)||ACCENTS[0],[,,hex,ink,on]=a;
+  const [R,G,B]=hexRgb(hex);
+  const v=dark?{
+    '--brand':hex,'--brand-fill':hex,'--brand-soft':mixHex(hex,'#211E1C',0.8),'--hero-bg':mixHex(hex,'#1C1917',0.8),
+    '--brand-ink':mixHex(hex,'#FFFFFF',0.42),'--on-brand':lum(hex)>0.3?'#15110F':'#FFFFFF','--halo-1':`rgba(${R},${G},${B},.13)`,'--hero-shadow':'rgba(0,0,0,.6)'
+  }:{
+    '--brand':hex,'--brand-fill':mixHex(hex,'#000000',0.04),'--brand-soft':mixHex(hex,'#FFFFFF',0.8),'--hero-bg':mixHex(hex,'#FFFFFF',0.72),
+    '--brand-ink':ink,'--on-brand':on,'--halo-1':`rgba(${R},${G},${B},.28)`,'--hero-shadow':`rgba(${R},${G},${B},.45)`
+  };
+  for(const k in v)r.style.setProperty(k,v[k]);
   $('meta[name=theme-color]').setAttribute('content',dark?'#171514':'#F5F0E9');
 }
 function applyAnim(){document.body.classList.toggle('no-anim',!S.settings.animations)}
@@ -2135,26 +2263,39 @@ async function bioEnable(){
     S.settings.bio=b64(cred.rawId);Store.core();toast('Face ID / Touch ID activé.');return true;
   }catch(e){toast('Face ID / Touch ID n\u2019est pas autorisé dans cet affichage. Ton code PIN reste actif.');return false}
 }
-async function bioUnlock(){
+let bioFails=0,bioBusy=false;
+async function bioUnlock(fromTap){
+  if(!locked||bioBusy||!S.settings.bio)return;
+  bioBusy=true;const t0=Date.now();
   try{
-    await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(S.settings.bio)}],userVerification:'required',timeout:60000}});
-    unlock();
-  }catch(e){const m=$('#lockMsg');if(m)m.textContent='Face ID indisponible, entre ton code.'}
+    await navigator.credentials.get({publicKey:{challenge:crypto.getRandomValues(new Uint8Array(32)),allowCredentials:[{type:'public-key',id:unb64(S.settings.bio),transports:['internal']}],userVerification:'required',timeout:60000}});
+    bioBusy=false;bioFails=0;unlock();
+  }catch(e){
+    bioBusy=false;
+    const blocked=!fromTap&&Date.now()-t0<900&&e&&e.name==='NotAllowedError';
+    const unsupported=e&&['NotSupportedError','SecurityError','InvalidStateError'].includes(e.name);
+    if(unsupported){bioFails=3}else if(!blocked){bioFails++}
+    if(bioFails>=3){showKeypad();return}
+    const m=$('#lockMsg');if(m)m.textContent=blocked?'Touche l\u2019écran pour utiliser Face ID':'Touche l\u2019écran pour réessayer';
+  }
 }
+function showKeypad(){const el=$('#lock');if(!el)return;el.classList.remove('bio-mode');const m=$('#lockMsg');if(m)m.textContent='Entre ton code'}
 function lockNow(){if(!S.settings.pinHash)return;locked=true;pinBuf='';closeSheet(true);renderLock()}
 function renderLock(){
   let el=$('#lock');if(!el){el=document.createElement('div');el.id='lock';el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');el.setAttribute('aria-label','Appli verrouillée');document.body.appendChild(el)}
-  const len=S.settings.pinLen||4;
-  el.innerHTML=`<div class="lock-mark">Sérénité</div><p class="lock-t" id="lockMsg">Entre ton code</p><div class="pin-dots" id="dots">${'<i></i>'.repeat(len)}</div>
-    <div class="keypad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}${S.settings.bio?`<button data-k="bio" aria-label="Déverrouiller avec Face ID ou Touch ID">${I.face}</button>`:'<span></span>'}<button data-k="0">0</button><button data-k="del" aria-label="Effacer">${I.del}</button></div>
+  const len=S.settings.pinLen||4,bio=!!S.settings.bio&&!!window.PublicKeyCredential;
+  bioFails=0;el.classList.toggle('bio-mode',bio);
+  el.innerHTML=`<div class="lock-mark">Sérénité</div><button class="bio-go" data-k="bio" aria-label="Déverrouiller avec Face ID">${I.face}</button><p class="lock-t" id="lockMsg">${bio?'':'Entre ton code'}</p><div class="pin-dots" id="dots">${'<i></i>'.repeat(len)}</div>
+    <div class="keypad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-k="${n}">${n}</button>`).join('')}<span></span><button data-k="0">0</button><button data-k="del" aria-label="Effacer">${I.del}</button></div>
     <p class="lock-help" id="lockHelp"></p>`;
-  el.onclick=e=>{const b=e.target.closest('[data-k]');if(b)key(b.dataset.k)};
+  el.onclick=e=>{const b=e.target.closest('[data-k]');if(b){key(b.dataset.k);return}if(el.classList.contains('bio-mode'))bioUnlock(true)};
+  if(bio)setTimeout(()=>bioUnlock(false),250);
 }
 function paintDots(){$$('#dots i').forEach((d,i)=>d.classList.toggle('on',i<pinBuf.length))}
 async function key(k){
   if(!locked)return;
   if(Date.now()<lockUntil)return;
-  if(k==='bio')return bioUnlock();
+  if(k==='bio')return bioUnlock(true);
   if(k==='del'){pinBuf=pinBuf.slice(0,-1);paintDots();return}
   if(pinBuf.length>=(S.settings.pinLen||4))return;
   pinBuf+=k;paintDots();
@@ -2164,7 +2305,7 @@ async function key(k){
     else{
       fails++;pinBuf='';const d=$('#dots');d.classList.remove('shake');void d.offsetWidth;d.classList.add('shake');setTimeout(paintDots,200);
       $('#lockMsg').textContent='Code incorrect';
-      if(fails>=5){lockUntil=Date.now()+30000;$('#lockHelp').textContent='Trop d\u2019essais. Réessaie dans 30 secondes. Code oublié : demande à Claude de le réinitialiser dans la conversation où l\u2019appli a été créée.';setTimeout(()=>{const h2=$('#lockHelp');if(h2)h2.textContent=''},30000)}
+      if(fails>=5){lockUntil=Date.now()+30000;$('#lockHelp').innerHTML=Store.mode==='supabase'?'Trop d\u2019essais. Réessaie dans 30 secondes.<br><button class="linkish" data-forgot style="margin-top:6px">Code oublié ? Reconnecte-toi avec ton e-mail</button>':'Trop d\u2019essais. Réessaie dans 30 secondes.';const fb=$('#lockHelp [data-forgot]');if(fb)fb.onclick=e=>{e.stopPropagation();forgotPin()};setTimeout(()=>{const h2=$('#lockHelp');if(h2&&!h2.querySelector('[data-forgot]'))h2.textContent=''},30000)}
     }
   }
 }
@@ -2202,16 +2343,30 @@ const Sound={
   ctx:null,ambG:null,fxG:null,rev:null,stopFn:null,
   ok(){
     if(!this.ctx){
+      try{if(navigator.audioSession)navigator.audioSession.type='playback'}catch(e){}
       const C=window.AudioContext||window.webkitAudioContext;if(!C)return false;
       try{this.ctx=new C()}catch(e){return false}
       const c=this.ctx;
-      this.ambG=c.createGain();this.ambG.gain.value=S.settings.amb.vol*0.9;this.ambG.connect(c.destination);
+      const comp=c.createDynamicsCompressor();comp.threshold.value=-20;comp.knee.value=12;comp.ratio.value=3;comp.attack.value=0.005;comp.release.value=0.35;comp.connect(c.destination);
+      this.ambG=c.createGain();this.ambG.gain.value=this.ambLevel(S.settings.amb.vol);this.ambG.connect(comp);
       this.fxG=c.createGain();this.fxG.gain.value=S.settings.soundVol;this.fxG.connect(c.destination);
       this.rev=c.createConvolver();this.rev.buffer=this.ir(4.2);
       const rg=c.createGain();rg.gain.value=0.55;this.rev.connect(rg);rg.connect(this.ambG);
     }
-    if(this.ctx.state==='suspended')this.ctx.resume().catch(()=>{});
+    if(this.ctx.state!=='running')this.ctx.resume().catch(()=>{});
+    this.unlockIOS();
     return true;
+  },
+  ambLevel(v){return Math.max(0,Math.min(1,v))*1.8},
+  /* iPhone : un son muet joué en boucle fait passer l'audio en mode « lecture », audible même en mode silencieux */
+  silentUrl(){
+    const n=8000,buf=new ArrayBuffer(44+n*2),dv=new DataView(buf),w=(o,s)=>{for(let i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i))};
+    w(0,'RIFF');dv.setUint32(4,36+n*2,true);w(8,'WAVE');w(12,'fmt ');dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);dv.setUint32(24,8000,true);dv.setUint32(28,16000,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);w(36,'data');dv.setUint32(40,n*2,true);
+    return URL.createObjectURL(new Blob([buf],{type:'audio/wav'}));
+  },
+  unlockIOS(){
+    if(!/iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)||!('ontouchend' in document))return;
+    try{if(!this.silent){this.silent=new Audio(this.silentUrl());this.silent.loop=true;this.silent.setAttribute('playsinline','')}if(this.silent.paused)this.silent.play().catch(()=>{})}catch(e){}
   },
   /* Réverbération douce et sombre : du bruit filtré qui s'éteint lentement */
   ir(sec){
@@ -2242,14 +2397,14 @@ const Sound={
   startAmb(type){
     if(!this.ok())return;this.stopAmb();
     const c=this.ctx,bus=c.createGain(),wet=c.createGain(),mix=c.createGain();
-    bus.gain.setValueAtTime(0.0001,c.currentTime);bus.gain.linearRampToValueAtTime(0.75,c.currentTime+2);bus.connect(this.ambG);
-    wet.gain.value=0.75;wet.connect(this.rev);mix.connect(bus);mix.connect(wet);
+    bus.gain.setValueAtTime(0.0001,c.currentTime);bus.gain.linearRampToValueAtTime(1,c.currentTime+1.2);bus.connect(this.ambG);
+    wet.gain.value=0.6;wet.connect(this.rev);mix.connect(bus);mix.connect(wet);
     const P={
-      doux:{scale:[261.63,293.66,329.63,392,440,523.25,587.33,659.25],root:[130.81,196],gap:[3200,6400],vel:[0.09,0.14]},
-      matin:{scale:[293.66,329.63,369.99,440,493.88,587.33,659.25,739.99],root:[146.83,220],gap:[2600,5200],vel:[0.08,0.12]},
-      soir:{scale:[220,261.63,293.66,329.63,392,440,523.25],root:[110,164.81],gap:[4200,8200],vel:[0.08,0.12]}
+      doux:{scale:[392,440,523.25,587.33,659.25,783.99,880,1046.5],root:[261.63,196],gap:[2800,5600],vel:[0.2,0.28]},
+      matin:{scale:[440,493.88,587.33,659.25,739.99,880,987.77,1174.66],root:[293.66,220],gap:[2400,4800],vel:[0.18,0.25]},
+      soir:{scale:[329.63,392,440,523.25,587.33,659.25,783.99],root:[220,196],gap:[3600,7000],vel:[0.18,0.26]}
     }[type]||null;
-    const cfg=P||{scale:[261.63,293.66,329.63,392,440,523.25],root:[130.81],gap:[3200,6400],vel:[0.09,0.14]};
+    const cfg=P||{scale:[392,440,523.25,587.33,659.25,783.99],root:[261.63],gap:[2800,5600],vel:[0.2,0.28]};
     let idx=Math.floor(cfg.scale.length/2),count=0,alive=true,timer=null;
     const rnd=(a,b)=>a+Math.random()*(b-a);
     const play=()=>{
@@ -2263,11 +2418,11 @@ const Sound={
       const rest=Math.random()<0.18?rnd(2500,4500):0;
       timer=setTimeout(play,rnd(cfg.gap[0],cfg.gap[1])+rest);
     };
-    timer=setTimeout(play,500);
+    timer=setTimeout(play,250);
     this.stopFn=()=>{alive=false;clearTimeout(timer);const t=c.currentTime;bus.gain.cancelScheduledValues(t);bus.gain.setValueAtTime(bus.gain.value,t);bus.gain.linearRampToValueAtTime(0.0001,t+1.5);wet.gain.setTargetAtTime(0,t,0.5);setTimeout(()=>{try{bus.disconnect();wet.disconnect()}catch(x){}},4000)};
   },
-  stopAmb(){if(this.stopFn){this.stopFn();this.stopFn=null}},
-  setVol(which,v){if(!this.ctx)return;const g=which==='amb'?this.ambG:this.fxG;g.gain.setTargetAtTime(which==='amb'?v*0.9:v,this.ctx.currentTime,0.05)},
+  stopAmb(){if(this.stopFn){this.stopFn();this.stopFn=null}if(this.silent&&!this.silent.paused)try{this.silent.pause()}catch(e){}},
+  setVol(which,v){if(!this.ctx)return;const g=which==='amb'?this.ambG:this.fxG;g.gain.setTargetAtTime(which==='amb'?this.ambLevel(v):v,this.ctx.currentTime,0.05)},
   tone(out,freq,t,{dur=2,vol=0.2,type='sine',attack=0.01,partials=[[1,1]]}={}){
     const c=this.ctx,g=c.createGain();
     g.gain.setValueAtTime(0.0001,t);g.gain.linearRampToValueAtTime(vol,t+attack);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);g.connect(out);
@@ -2343,7 +2498,7 @@ async function makePDF(period){
 function backup(){saveFile(`serenite-sauvegarde-${today()}.json`,JSON.stringify({app:'serenite',v:1,exportedAt:new Date().toISOString(),core:S,tx:TX}),'application/json')}
 function replaceAll(core,tx){
   for(const m of Object.keys(TX))Store.month(m);for(const m of Store.known)Store.month(m);
-  S=normalize(core);TX=tx?clone(tx):{};_all=null;
+  S=normalize(core);TX=tx?clone(tx):{};_all=null;migrate();
   for(const m of Object.keys(TX))Store.month(m);Store.core();
   applyTheme();applyAnim();Sound.stopAmb();runChecks();render();
 }
@@ -2371,7 +2526,8 @@ function render(){
   const main=$('#main');main.innerHTML=VIEWS[U.view]();
   const cur=U.view==='pocket'?'pockets':U.view;
   $$('#tabs [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===cur?'page':'false'));
-  const fab=$('#fab');fab.hidden=['settings','notifs','pocket'].includes(U.view);fab.classList.remove('away');
+  const fab=$('#fab');fab.hidden=U.viewing||['home','settings','notifs','pocket'].includes(U.view);fab.classList.remove('away');$('#tabs').classList.remove('hide');
+  document.body.classList.toggle('viewing',!!U.viewing);renderViewBar();
   animateCounts();
   document.body.classList.toggle('discreet',U.discreet);
   maskMoney(main);
@@ -2406,7 +2562,10 @@ function goBack(){
 }
 const ACT={
   back:goBack,close:()=>closeSheet(),forecast:openForecast,quick:()=>openPurchase({fab:true}),
-  qs:el=>{const k=el.dataset.id;if(k==='achat')openPurchase({fab:true});else if(k==='revenu')openIncome(null,null,{fab:true});else if(k==='echeance')openBillForm(null,{fab:true});else openSave('',{fab:true})},
+  qs:el=>{const k=el.dataset.id;if(k==='achat')openPurchase({fab:true});else if(k==='revenu')openIncome(null,null,{fab:true});else if(k==='echeance')openBillForm(null,{fab:true});else if(k==='transfert')openTransfer('',{fab:true});else openSave('',{fab:true})},
+  transfer:el=>openTransfer(el.dataset.id||''),
+  ambTest:()=>{if(!S.settings.amb.on){S.settings.amb.on=true;Store.core()}Sound.startAmb(S.settings.amb.type);render()},
+  shareAdd:()=>openShareAdd(),shareRemove:el=>removeShare(el.dataset.id),viewOwner:el=>enterView(el.dataset.id),exitView:()=>exitView(),
   discreet:()=>{U.discreet=!U.discreet;render();toast(U.discreet?'Montants masqués.':'Montants affichés.')},
   incOk:el=>confirmIncome(el.dataset.id),
   logout:()=>logout(false),logoutAll:()=>logout(true),changePass:()=>openChangePass(),deleteAccount:()=>deleteAccount(),incFix:el=>openConfirmIncome(el.dataset.id),
@@ -2443,9 +2602,11 @@ const ACT={
   pdf:openExport,backup,restore,reset:resetAll
 };
 let suppressClick=false;
+const WRITE_ACTIONS=new Set(['addPurchase','addBill','addCredit','addFuture','addGoal','income','withdraw','saveMoney','adjust','pay','later','bill','newPocket','editPocket','restorePocket','quick','qs','incOk','incFix','addRecurring','editRecurring','transfer','clearNotifs','cats','reset','restore','profile','shareAdd','shareRemove']);
 document.addEventListener('click',async e=>{
   if(locked)return;
   if(suppressClick){e.preventDefault();e.stopPropagation();return}
+  if(U.viewing){const w=e.target.closest('[data-a]');if(w&&WRITE_ACTIONS.has(w.dataset.a)){e.preventDefault();toast('Lecture seule : tu consultes les comptes d\u2019une autre personne.');return}}
   const tg=e.target.closest('[data-toggle]');
   if(tg){
     const p=tg.dataset.toggle;
@@ -2488,13 +2649,14 @@ function startApp(core,tx,opts={}){
   S=normalize(core);TX=tx||{};_all=null;
   if(opts.name&&!S.settings.name)S.settings.name=opts.name;
   if(!core)Store.core();
+  migrate();
   applyTheme();applyAnim();
   if(!started){
     $('#tabs nav').innerHTML=TABS.map(([k,l,ic])=>`<button data-go="${k}"><span>${ic}</span>${l}</button>`).join('');
     $('#fab').innerHTML=I.plus;
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(S&&S.settings.theme==='auto')applyTheme()});
-    const startAmb=()=>{document.removeEventListener('pointerdown',startAmb,true);if(S&&S.settings.amb.on)Sound.startAmb(S.settings.amb.type)};
-    document.addEventListener('pointerdown',startAmb,true);
+    /* Le son d'ambiance démarre (ou redémarre après une mise en veille) au premier toucher : c'est la règle des navigateurs */
+    document.addEventListener('pointerdown',()=>{if(!S||!S.settings.amb.on)return;if(!Sound.stopFn)Sound.startAmb(S.settings.amb.type);else Sound.ok()},true);
     setInterval(()=>{if(S&&!document.hidden&&!locked){runChecks();if(U.view==='home'||U.view==='bills')softRender()}},60000);
     started=true;
   }
@@ -2536,14 +2698,21 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden)privacyOn()
 document.addEventListener('pointerdown',privacyOff,true);
 
 /* ---------- Bouton + qui s'efface quand on descend ---------- */
-let lastY=0;
-window.addEventListener('scroll',()=>{const y=window.scrollY,fab=$('#fab');if(!fab)return;if(y>lastY+6&&y>100)fab.classList.add('away');else if(y<lastY-6||y<60)fab.classList.remove('away');lastY=y},{passive:true});
+/* ---------- Barre du bas : s'efface pendant le défilement, revient dès qu'on s'arrête ---------- */
+let lastY=0,scrollT=null;
+function barsShow(show){const t=$('#tabs'),f=$('#fab');if(t)t.classList.toggle('hide',!show);if(f)f.classList.toggle('away',!show)}
+window.addEventListener('scroll',()=>{
+  const y=window.scrollY,dy=y-lastY;lastY=y;
+  if(y<20){clearTimeout(scrollT);barsShow(true);return}
+  if(Math.abs(dy)>3)barsShow(false);
+  clearTimeout(scrollT);scrollT=setTimeout(()=>barsShow(true),280);
+},{passive:true});
 
 /* ---------- Glisser une échéance : droite = payé, gauche = payer plus tard ---------- */
 let sw=null;
 function resetSwipe(s){s.card.style.transform='';s.card.classList.remove('dragging');const w=s.card.parentElement;if(w)w.classList.remove('go-right','go-left','armed')}
 document.addEventListener('pointerdown',e=>{
-  if(locked)return;const card=e.target.closest('.ecard[data-swipe]');if(!card)return;
+  if(locked||U.viewing)return;const card=e.target.closest('.ecard[data-swipe]');if(!card)return;
   if(e.pointerType==='mouse'&&e.button!==0)return;
   sw={card,id:card.dataset.card,x0:e.clientX,y0:e.clientY,dx:0,active:false,pid:e.pointerId};
 },{passive:true});
@@ -2601,7 +2770,10 @@ async function enterWith(user){
   try{data=await Store.loadOnline()}
   catch(e){console.warn(e);showAuth('signin',{msg:'Impossible de charger tes données. Vérifie ta connexion internet, puis reconnecte-toi.'});return}
   if(location.hash.includes('access_token')||location.search.includes('code='))history.replaceState(null,'',appUrl());
+  let resetPin=false;try{resetPin=localStorage.getItem('serenite-reset-pin')==='1';localStorage.removeItem('serenite-reset-pin')}catch(e){}
+  if(resetPin&&data.core&&data.core.settings)Object.assign(data.core.settings,{pinHash:null,pinSalt:null,bio:null});
   startApp(data.core,data.tx,{name:(user.user_metadata&&user.user_metadata.first_name)||''});
+  if(resetPin){Store.core();toast('Code supprimé. Tu peux en choisir un nouveau dans Réglages, puis Sécurité.')}
   if(data.fromCache)Store.pullRemote(data.cacheAt);else Store.saveCache(false);
 }
 function showSetupNeeded(noLib){
@@ -2703,6 +2875,100 @@ async function deleteAccount(){
 }
 window.addEventListener('online',()=>{if(Store.mode==='supabase')Store.now()});
 
+
+/* ---------- Code oublié : on se reconnecte avec l'e-mail et le mot de passe ---------- */
+async function forgotPin(){
+  if(!await ask('Code oublié ?','Tu vas être déconnecté. Reconnecte-toi avec ton e-mail et ton mot de passe : ton code sera supprimé et tu pourras en choisir un nouveau.',{ok:'Me reconnecter'}))return;
+  try{localStorage.setItem('serenite-reset-pin','1')}catch(e){}
+  await waitSync(3000);
+  try{await SB.auth.signOut()}catch(e){}
+  Store.clearCache();location.replace(appUrl());
+}
+
+/* ---------- Gestion des accès (partage en lecture seule, protégé par Supabase) ---------- */
+let SELF=null,sharesLoading=false;
+const isMissingTable=e=>/does not exist|schema cache|PGRST205|42P01/i.test(String((e&&e.message)||'')+String((e&&e.code)||''));
+async function loadShares(){
+  if(sharesLoading||!SB||!ACCOUNT)return;sharesLoading=true;
+  try{
+    const r=await SB.from('serenite_shares').select('id,owner_id,owner_name,viewer_email,permission,created_at,last_seen_at').order('created_at',{ascending:true});
+    if(r.error)throw r.error;
+    const rows=r.data||[];
+    U.shares={mine:rows.filter(x=>x.owner_id===ACCOUNT.id),withMe:rows.filter(x=>x.owner_id!==ACCOUNT.id)};
+  }catch(e){U.shares={mine:[],withMe:[],error:isMissingTable(e)?'missing':'net'}}
+  sharesLoading=false;
+  if(U.view==='settings'&&U.setCat==='share')render();
+}
+function shareSettingsHTML(grp,row){
+  if(Store.mode!=='supabase'||!ACCOUNT)return grp(row('Gestion des accès','','Disponible dans la version en ligne, avec un compte Sérénité.'));
+  if(!U.shares){loadShares();return '<p class="empty">Chargement…</p>'}
+  const sh=U.shares;
+  if(sh.error==='missing')return grp(row('Une étape à faire dans Supabase','','Le partage doit d\u2019abord être activé : lance le fichier « supabase-partage.sql » dans SQL Editor, puis reviens ici.'))+'<div class="center"><button class="linkish" data-a="shareReload">Réessayer</button></div>';
+  if(sh.error)return grp(row('Impossible de charger les accès','','Vérifie ta connexion internet.'))+'<div class="center"><button class="linkish" data-a="shareReload">Réessayer</button></div>';
+  const seen=x=>x.last_seen_at?`, consulté ${timeAgo(Date.parse(x.last_seen_at))}`:', pas encore consulté';
+  return `<h3 class="grp">Propriétaire</h3>${grp(row('Toi','',`${esc(ACCOUNT.email||'')}, tous les droits`))}
+  <h3 class="grp">Personnes autorisées</h3>
+  ${sh.mine.length?grp(sh.mine.map(x=>row(esc(x.viewer_email),`<button class="mini" data-a="shareRemove" data-id="${x.id}" style="color:var(--bad)">Retirer</button>`,`Consultation, lecture seule${seen(x)}`)).join('')):'<p class="empty">Personne n\u2019a accès à tes comptes.</p>'}
+  <div style="margin:14px 0 6px"><button class="btn wide" data-a="shareAdd">+ Ajouter une personne</button></div>
+  <h3 class="grp">Comptes partagés avec toi</h3>
+  ${sh.withMe.length?grp(sh.withMe.map(x=>row(esc(x.owner_name||'Un proche'),`<button class="mini" data-a="viewOwner" data-id="${x.owner_id}">Consulter</button>`,'Lecture seule')).join('')):'<p class="empty">Personne ne t\u2019a encore donné accès à ses comptes.</p>'}
+  <p class="s" style="margin:12px 4px 0">Une personne autorisée peut tout consulter mais ne peut rien modifier. Cette règle est vérifiée par la base de données elle-même, pas seulement par l'appli.</p>`;
+}
+function openShareAdd(){
+  const s=sheet(`<h2>Ajouter une personne</h2><p class="sub">Elle pourra consulter tes comptes, tes échéances et ton historique, sans pouvoir rien modifier. Elle doit avoir (ou créer) un compte Sérénité avec cette adresse e-mail.</p><form novalidate>
+    <label class="f"><span>Adresse e-mail</span><input name="email" type="email" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="prenom.nom@gmail.com"><em class="err" data-err="email"></em></label>
+    ${F.select('perm','Autorisation',[['read','Consultation (lecture seule)']],'read')}
+    <p class="err" data-err="form"></p>
+    <button class="btn block" type="submit">Autoriser</button></form>`);
+  const f=s.querySelector('form');
+  f.addEventListener('submit',async e=>{
+    e.preventDefault();const email=(f.email.value||'').trim().toLowerCase();
+    if(!setErr(f,'email',/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)?'':'Adresse e-mail invalide.'))return;
+    if(ACCOUNT&&email===(ACCOUNT.email||'').toLowerCase()){setErr(f,'email','C\u2019est ta propre adresse.');return}
+    const btn=f.querySelector('[type=submit]');btn.disabled=true;
+    const r=await SB.from('serenite_shares').insert({owner_id:ACCOUNT.id,owner_name:(S.settings.name||'').trim()||null,viewer_email:email,permission:'read'});
+    btn.disabled=false;
+    if(r.error){setErr(f,'form',r.error.code==='23505'||/duplicate/i.test(r.error.message||'')?'Cette personne a déjà accès.':isMissingTable(r.error)?'Le partage n\u2019est pas encore activé : lance le fichier SQL de partage dans Supabase.':'Impossible d\u2019ajouter cette personne pour l\u2019instant.');return}
+    closeSheet();U.shares=null;render();toast(`${email} peut maintenant consulter tes comptes.`);
+  });
+}
+async function removeShare(id){
+  const x=U.shares&&U.shares.mine.find(y=>y.id===id);
+  if(!await ask('Retirer l\u2019accès ?',x?`${x.viewer_email} ne pourra plus consulter tes comptes.`:'',{ok:'Retirer',danger:true}))return;
+  const r=await SB.from('serenite_shares').delete().eq('id',id);
+  if(r.error){toast('Impossible de retirer l\u2019accès pour l\u2019instant.');return}
+  U.shares=null;render();toast('Accès retiré.');
+}
+async function enterView(ownerId){
+  const sh=U.shares&&U.shares.withMe.find(x=>x.owner_id===ownerId),name=(sh&&sh.owner_name)||'ton proche';
+  await waitSync(3000);
+  try{
+    const c=await SB.from('serenite_core').select('data').eq('user_id',ownerId).maybeSingle();
+    const t=await SB.from('serenite_tx').select('month,items').eq('user_id',ownerId);
+    if(c.error||t.error)throw (c.error||t.error);
+    if(!c.data){toast('Cette personne n\u2019a pas encore configuré Sérénité.');return}
+    const tx={};for(const r of t.data||[])if(Array.isArray(r.items)&&r.items.length)tx[r.month]=r.items;
+    SELF={S,TX};
+    const own=normalize(c.data.data),mine=clone(SELF.S.settings);
+    ['theme','accent','animations','amb','sound','soundVol','privacyBlur','discreetStart','pinHash','pinSalt','pinLen','bio','autolock','notif','dailyTime','name'].forEach(k=>own.settings[k]=mine[k]);
+    Store.readOnly=true;S=own;TX=tx;_all=null;
+    U.viewing={ownerId,name};U.stack=[];U.view='home';U.discreet=false;
+    generate();applyTheme();render();window.scrollTo(0,0);
+    SB.rpc('serenite_touch_share',{p_owner:ownerId}).then(()=>{},()=>{});
+  }catch(e){toast('Accès impossible pour l\u2019instant. La personne a peut-être retiré ton accès.')}
+}
+function exitView(){
+  if(!SELF){U.viewing=null;render();return}
+  S=SELF.S;TX=SELF.TX;SELF=null;_all=null;U.viewing=null;Store.readOnly=false;
+  U.view='home';U.stack=[];U.shares=null;applyTheme();render();window.scrollTo(0,0);toast('Tu es de retour sur ton compte.');
+}
+function renderViewBar(){
+  let b=$('#viewbar');
+  if(!U.viewing){if(b)b.remove();return}
+  if(!b){b=document.createElement('div');b.id='viewbar';document.body.appendChild(b)}
+  b.innerHTML=`<span>Lecture seule</span><button data-a="exitView">Revenir à mon compte</button>`;
+}
+ACT.shareReload=()=>{U.shares=null;render()};
 init();
 </script>
 </body>
