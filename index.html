@@ -629,6 +629,31 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 .check{display:flex;gap:12px;align-items:flex-start;margin:4px 0 6px;font-size:15px;line-height:1.4}
 .check input{width:22px;height:22px;flex:none;margin:1px 0 0;accent-color:var(--brand-ink)}
 
+
+/* Carte du solde compacte */
+.hero.compact{padding:18px 20px 16px;margin:4px 0 22px;border-radius:26px}
+.hero.compact .lbl-top{font-size:11.5px;margin-bottom:2px}
+.hero.compact .big{font-size:clamp(30px,9vw,38px);line-height:1.1}
+.hero.compact .say{margin:8px 0 0;font-size:13.5px;line-height:1.3;gap:8px}
+.hero.compact .say i{width:7px;height:7px}
+.hero.compact .after{display:block;margin-top:8px;padding:4px 0;font-size:12.5px;line-height:1.4;color:var(--ink-2);text-align:left}
+.hero.compact .after b{white-space:nowrap}
+.hero.compact .after b{font-weight:600;color:var(--ink)}
+.hero.compact .after b.neg{color:var(--bad)}
+.hero.compact .after svg{width:13px;height:13px;opacity:.6;vertical-align:-2px;margin-left:2px}
+.hero.compact .r1,.hero.compact .r4{width:200px;height:200px;right:-60px;bottom:-90px}
+.hero.compact .r2{width:130px;height:130px;right:-25px;bottom:-55px}
+.hero.compact .r3{width:64px;height:64px;right:14px;bottom:-22px}
+/* Petits écrans (zoom d'affichage de l'iPhone) : rien ne doit être coupé */
+@media (max-width:360px){
+  .qa button{font-size:11.5px;gap:6px}
+  .qa button span{width:50px;height:50px;border-radius:18px}
+  .tabs button{font-size:9.5px;letter-spacing:-.01em}
+  .hello h1{font-size:30px}
+  .sec h2{font-size:21px}
+  .sec .more{white-space:nowrap}
+}
+
 /* Animations désactivées */
 .no-anim *,.no-anim *::before,.no-anim *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
@@ -802,7 +827,7 @@ const TOTAL_COLORS=[
   ['violet','Violet','#7C3AED'],['orange','Orange','#EA7A17'],['ambre','Ambre','#D48A06'],['fuchsia','Fuchsia','#D1348F']
 ];
 const TC_OLD={brand:'indigo',encre:'royal',nuit:'royal',prune:'violet'};
-const SHOW_ITEMS=[['total','Solde total'],['dispo','Disponible réel'],['urgent','Alertes urgentes'],['actions','Actions rapides'],['echeances','Échéances'],['credits','Crédits'],['poches','Poches'],['achats','Achats'],['epargne','Épargne'],['objectifs','Objectifs d\u2019épargne'],['operations','Opérations récentes'],['historique','Historique'],['stats','Statistiques']];
+const SHOW_ITEMS=[['total','Solde total'],['dispo','Solde après prélèvements'],['urgent','Alertes urgentes'],['actions','Actions rapides'],['echeances','Échéances'],['credits','Crédits'],['poches','Poches'],['achats','Achats'],['epargne','Épargne'],['objectifs','Objectifs d\u2019épargne'],['operations','Opérations récentes'],['historique','Historique'],['stats','Statistiques']];
 const showOn=k=>!S||!S.settings.show||S.settings.show[k]!==false;
 const FX_SOUNDS=[['doux','Son doux'],['piano','Petit piano'],['goutte','Goutte'],['cloche','Cloche'],['aucun','Aucun son']];
 const DEFAULT_CATS=[
@@ -1458,11 +1483,11 @@ function vHome(){
   if(activePockets().length>1)qa.push(`<button data-a="transfer"><span>${I.swap}</span>Transférer</button>`);
   qa.push(`<button data-a="newPocket"><span>${I.plus}</span>Nouvelle poche</button>`);
   return `<header class="top" style="align-items:flex-start"><div class="hello"><p>${esc(cap(fLong.format(new Date())))}</p><h1>${esc(hello)}</h1></div>${bellBtn()}<button class="avatar" data-go="settings" aria-label="Profil et réglages">${initial()}</button></header>
-  <section class="hero enter" aria-label="Situation générale">
+  <section class="hero compact enter" aria-label="Situation générale">
     <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
     ${showOn('total')?`<span class="lbl-top">SOLDE TOTAL</span><button class="bigbtn" data-a="discreet" style="${totalColorStyle(f.total)}" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('total',f.total,'big')}</button>`:''}
     <span class="say"><i class="${sum.cls}"></i>${esc(sum.txt)}</span>
-    ${showOn('dispo')?`<button class="dispo" data-a="forecast"><span>Disponible réel<small>après les échéances à venir</small></span><b>${money(f.dispo)}</b>${I.chev}</button>`:''}
+    ${showOn('dispo')?`<button class="after" data-a="forecast">Solde après prélèvements : <b class="${f.dispo<0?'neg':''}">${money(f.dispo)}</b>${I.chev}</button>`:''}
   </section>
   ${urg.length?`<button class="urgent-banner" data-a="urgentView">${tileHTML('alert','bad')}<span class="mid"><b>URGENT</b><span class="s">${urg.length>1?`${urg.length} paiements à régler, ${money(urgTotal)}`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
   ${U.viewing?'':incomeCards()}
@@ -2123,7 +2148,7 @@ function openForecast(){
     ${kv('Solde '+courantPockets().map(p=>pName(p.id)).join(' + '),money(f.soldes))}
     ${kv('Échéances à venir',f.ech?'−'+money(f.ech):money(0))}${occ}
     ${kv('Épargne prévue',f.ep?'−'+money(f.ep):money(0))}${plans}
-    <div class="kv sum"><span>Disponible réel</span><b class="num">${money(f.dispo)}</b></div>
+    <div class="kv sum"><span>Solde après prélèvements</span><b class="num">${money(f.dispo)}</b></div>
     <p class="s" style="margin-top:14px">Les échéances ne sont débitées que lorsque tu les marques payées${S.settings.validation==='auto'?', ou automatiquement après le délai choisi':''}. Ton épargne n'est pas comptée ici : elle est déjà mise de côté.</p>
     <div class="actions"><button class="btn ghost" data-go="settings:pay">Changer la période de calcul</button></div>`);
 }
@@ -2456,7 +2481,7 @@ function vSettings(){
     body=`${grp(row('Validation des échéances',sel('validation',[['manual','Manuelle'],['auto','Automatique']],st.validation,'Validation'),st.validation==='auto'?'Une échéance non marquée payée est validée après le délai choisi. Tu es prévenu la veille.':'Tu valides toi-même chaque paiement.')
       +(st.validation==='auto'?row('Délai avant validation',sel('autoDelay',[[1,'1 jour'],[2,'2 jours'],[3,'3 jours'],[7,'7 jours'],['custom','Personnalisé']],st.autoDelay,'Délai')):'')
       +(st.validation==='auto'&&st.autoDelay==='custom'?row('Nombre de jours',`<input type="number" min="1" max="60" data-set="autoCustom" value="${st.autoCustom}" aria-label="Nombre de jours">`):''))}
-    <h3 class="grp">Disponible réel</h3>${grp(row('Calculé jusqu\u2019à',sel('horizon',[['month','La fin du mois'],['payday','La prochaine paie']],st.horizon,'Période de calcul'))+(st.horizon==='payday'?(S.recurring.some(x=>!x.paused&&x.freq==='monthly'&&!isSaving(x.pocket))?row('Jour de paie','',`Le ${paydayDay()}, d\u2019après ton revenu automatique`):row('Jour de paie',sel('payday',Array.from({length:31},(_,i)=>[i+1,'Le '+(i+1)]),st.payday,'Jour de paie'))):''))}`;
+    <h3 class="grp">Solde après prélèvements</h3>${grp(row('Calculé jusqu\u2019à',sel('horizon',[['month','La fin du mois'],['payday','La prochaine paie']],st.horizon,'Période de calcul'))+(st.horizon==='payday'?(S.recurring.some(x=>!x.paused&&x.freq==='monthly'&&!isSaving(x.pocket))?row('Jour de paie','',`Le ${paydayDay()}, d\u2019après ton revenu automatique`):row('Jour de paie',sel('payday',Array.from({length:31},(_,i)=>[i+1,'Le '+(i+1)]),st.payday,'Jour de paie'))):''))}`;
   }else if(c==='show'){
     const pk=S.pockets.filter(p=>!p.archived);
     body=`<p class="s" style="margin:0 4px 12px">Ce que tu désactives disparaît de l'interface. Rien n'est supprimé : tout continue de fonctionner, et réapparaît dès que tu le réactives.</p>
@@ -2737,7 +2762,7 @@ async function makePDF(period){
   else{put('Poka Finance',L,{size:22,bold:true});y+=7}
   put('Relevé du '+dLong(today()),L,{color:grey});y+=4;
   const f=forecast();
-  h('Soldes');activePockets().forEach(p=>line(pName(p.id),money(balance(p.id))));line('Total',money(f.total),{bold:true});line(`Disponible réel (jusqu'au ${dLong(f.h)})`,money(f.dispo),{bold:true});
+  h('Soldes');activePockets().forEach(p=>line(pName(p.id),money(balance(p.id))));line('Total',money(f.total),{bold:true});line(`Solde après prélèvements (jusqu'au ${dLong(f.h)})`,money(f.dispo),{bold:true});
   h('Échéances à payer');const td=todoOcc();if(!td.length)line('Aucune échéance à payer','');td.forEach(o=>line(`${cut(billName(o),60)}, ${dShort(o.due)}${o.due<today()?' (en retard)':''}`,money(o.amount)));
   const loans=S.bills.filter(b=>b.type==='credit'&&!b.deleted);
   if(loans.length){h('Crédits');loans.forEach(b=>{const s=loanStats(b);line(`${cut(b.name,40)}${b.loan&&b.loan.ref?' (réf. '+cut(b.loan.ref,20)+')':''}`,`reste ${money(s.remaining)} sur ${money(s.total)}`)})}
