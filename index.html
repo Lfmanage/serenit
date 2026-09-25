@@ -542,6 +542,47 @@ body.viewing .app{padding-top:48px}
 body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet [data-del],body.viewing .sheet [data-pay],body.viewing .sheet [data-later],body.viewing .sheet [data-skip],body.viewing .sheet [data-unpay],body.viewing .sheet [data-restore],body.viewing .sheet [data-e],body.viewing .sheet [data-d],body.viewing .sheet [data-w],body.viewing .sheet .btn.block[data-a],body.viewing .markpaid,body.viewing .later,body.viewing .inc-card .btns{display:none!important}
 
 
+
+/* ================= Version bureau (≥960px) : mise en page large, façon site web ================= */
+@media (min-width:960px){
+  body{background:var(--bg)}
+  .app{max-width:1080px;margin:0 40px 0 296px;padding:36px 40px 80px}
+  #boot,#auth,#lock{margin-left:0}
+  body[data-view]:not([data-view=""]) .app{max-width:1080px}
+
+  /* Barre du bas -> barre latérale fixe à gauche */
+  .tabs{position:fixed;left:0;top:0;bottom:0;right:auto;width:240px;padding:28px 18px;z-index:30;background:var(--surface);border-right:1px solid var(--line);display:flex;flex-direction:column}
+  .tabs::before{content:"Poka";display:flex;align-items:center;gap:10px;height:32px;margin:0 6px 26px;font-family:var(--serif);font-size:21px;color:var(--ink);background:var(--pk-mark-l) left center/contain no-repeat;background-size:26px;padding-left:36px}
+  :root[data-theme="dark"] .tabs::before{background-image:var(--pk-mark-d)}
+  @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tabs::before{background-image:var(--pk-mark-d)}}
+  .tabs nav{pointer-events:auto;max-width:none;margin:0;height:auto;display:flex;flex-direction:column;gap:4px;background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:0;box-shadow:none}
+  .tabs button{flex-direction:row;justify-content:flex-start;gap:12px;min-height:48px;padding:0 12px;border-radius:14px;font-size:14.5px}
+  .tabs button:hover{background:var(--surface-2)}
+  .tabs button span{width:34px;height:34px;border-radius:11px;flex:none}
+  .tabs button[aria-current="page"]{background:var(--brand-soft)}
+  .tabs button[aria-current="page"] span{background:transparent}
+
+  .fab{right:40px;bottom:40px}
+
+  /* Accueil et Poches : mise en page en grille façon tableau de bord */
+  .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+  .home-grid .blk{margin:0}
+  .cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+  .cards-grid .pbig{height:100%}
+  .qa{max-width:640px}
+  .hero{max-width:640px}
+
+  /* Fenêtres et messages de confirmation : centrés plutôt qu'en tiroir */
+  .scrim{align-items:center;padding:24px}
+  .sheet{border-radius:28px;max-width:560px;max-height:min(760px,calc(100% - 48px));transform:translateY(14px) scale(.98);box-shadow:var(--shadow-lg)}
+  .scrim.in .sheet{transform:translateY(0) scale(1)}
+  .sheet::before{display:none}
+}
+@media (min-width:1280px){
+  .app{margin-left:320px;max-width:1180px}
+  .tabs{width:264px}
+}
+
 /* Version 7 : cartes compactes dépliables, mois par mois, apparence */
 .tabs nav{grid-template-columns:repeat(5,minmax(0,1fr))}
 .tabs button{font-size:11px}
@@ -1513,11 +1554,13 @@ function vHome(){
   ${urg.length?`<button class="urgent-banner" data-a="urgentView">${tileHTML('alert','bad')}<span class="mid"><b>URGENT</b><span class="s">${urg.length>1?`${urg.length} paiements à régler, ${money(urgTotal)}`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
   ${U.viewing?'':incomeCards()}
   ${U.viewing||!showOn('actions')?'':`<nav class="qa" style="grid-template-columns:repeat(${qa.length},minmax(0,1fr))" aria-label="Actions rapides">${qa.join('')}</nav>`}
+  <div class="home-grid">
   ${showOn('echeances')?`<section class="blk"><div class="sec"><h2>Prochaines échéances</h2><button class="more" data-go="bills">Tout voir</button></div>
     ${up.length?`<div class="stack">${up.map(dueMini).join('')}</div>`:'<p class="empty">Rien à payer dans les prochains jours.</p>'}</section>`:''}
   ${showOn('poches')?`<section class="blk"><div class="sec"><h2>Poches</h2><button class="more" data-go="pockets">Tout voir</button></div><div class="list">${shown.map(accRow).join('')}</div></section>`:''}
   ${showOn('objectifs')&&S.goals.length?`<section class="blk"><div class="sec"><h2>Objectifs d'épargne</h2><button class="more" data-go="pocket:${goalPocket(S.goals[0])}">Tout voir</button></div><div class="stack">${S.goals.slice(0,2).map(g=>goalCard(g,{compact:true})).join('')}</div></section>`:''}
-  ${showOn('operations')&&recent.length?`<section class="blk"><div class="sec"><h2>Opérations récentes</h2>${showOn('historique')?'<button class="more" data-go="history">Tout voir</button>':''}</div><div class="list">${recent.map(t=>txRow(t,{date:true})).join('')}</div></section>`:''}`;
+  ${showOn('operations')&&recent.length?`<section class="blk"><div class="sec"><h2>Opérations récentes</h2>${showOn('historique')?'<button class="more" data-go="history">Tout voir</button>':''}</div><div class="list">${recent.map(t=>txRow(t,{date:true})).join('')}</div></section>`:''}
+  </div>`;
 }
 /* ---------- Échéances ---------- */
 function billMonthBounds(){
@@ -1584,7 +1627,7 @@ function vPockets(){
       <button data-go="pocket:${p.id}" style="text-align:left">${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}</button>${info}
       ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}</section>`;
   };
-  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}${act.map(card).join('')}
+  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="cards-grid">${act.map(card).join('')}</div>
   ${U.viewing?'':'<button class="btn ghost wide" data-a="newPocket">+ Ajouter une poche</button>'}
   ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
 }
@@ -2873,6 +2916,7 @@ const VIEWS={home:vHome,bills:vBills,pockets:vPockets,pocket:vPocket,history:vHi
 function render(){
   if(!S)return;
   const main=$('#main');main.innerHTML=VIEWS[U.view]();
+  document.body.dataset.view=U.view==='pocket'?'pockets':U.view;
   const cur=U.view==='pocket'?'pockets':U.view;
   $$('#tabs [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===cur?'page':'false'));
   if(TABS.some(x=>x[0]===U.view)&&!tabOn(U.view)){U.view='home';main.innerHTML=VIEWS.home()}
