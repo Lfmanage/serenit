@@ -651,6 +651,15 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 .hello-mark{width:74px}
 
 
+
+/* Choix : poche ou objectif */
+.choice-list{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.choice{display:flex;align-items:center;gap:14px;width:100%;padding:16px;border-radius:22px;background:var(--surface-2);text-align:left;color:var(--ink)}
+.choice .nm{font-size:16px;font-weight:600}
+.choice .s{display:block;font-size:13px;color:var(--ink-2);margin-top:2px}
+/* Objectif dans la grille des poches/comptes : bordure en pointillés pour bien le différencier d'une poche */
+.cards-grid .goal{border:1.5px dashed var(--line);box-shadow:none;background:var(--surface-2)}
+
 /* Statistiques simplifiées */
 .stat-list{display:flex;flex-direction:column;gap:10px;margin:0 0 30px}
 .stat{display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);text-align:left;color:var(--ink)}
@@ -801,6 +810,7 @@ const I={
   del:ic('<path d="M9 6h10a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5-6z"/><path d="M12.5 10l4 4M16.5 10l-4 4"/>'),
   box:ic('<path d="M4 8l8-4 8 4v8l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v8"/>'),
   sprout:ic('<path d="M12 20v-7"/><path d="M12 13c0-4.4 3-7.5 7.5-7.5 0 4.4-3 7.5-7.5 7.5z"/><path d="M12 15c0-3.3-2.4-5.8-6-5.8 0 3.3 2.4 5.8 6 5.8z"/>'),
+  target:ic('<circle cx="12" cy="12" r="7.5"/><circle cx="12" cy="12" r="4"/><circle cx="12" cy="12" r=".9" fill="currentColor" stroke="none"/>'),
   check:ic('<path d="M5 12.5l4.5 4.5L19 7.5"/>',2),
   cart:ic('<path d="M4 5h2l2 10h10l2-7H7.2"/><circle cx="10" cy="19" r="1.3"/><circle cx="17" cy="19" r="1.3"/>'),
   arrowIn:ic('<path d="M12 4v11M7 10l5 5 5-5"/><path d="M5 20h14"/>'),
@@ -1618,17 +1628,17 @@ function pocketActions(p){
   return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter de l'argent</button>${activePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${p.id}">Transférer</button>`:''}`;
 }
 function vPockets(){
-  const act=activePockets().filter(p=>p.show!==false),arch=S.pockets.filter(p=>p.archived);
+  const act=activePockets(),arch=S.pockets.filter(p=>p.archived);
   const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
+  const goals=showOn('objectifs')?S.goals.slice():[];
   const card=p=>{
-    const v=balance(p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id);
-    const info=p.type==='epargne'&&showOn('objectifs')&&goals.length?`<button class="linkish" data-go="pocket:${p.id}" style="min-height:32px;align-self:flex-start">${goals.length} objectif${goals.length>1?'s':''} en cours</button>`:'';
+    const v=balance(p.id);
     return `<section class="pbig" style="view-transition-name:pk-${p.id}"><button class="head" data-go="pocket:${p.id}" style="text-align:left">${tileHTML(pIcon(p.id))}<span style="flex:1;display:flex;flex-direction:column"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Poche courante'}</span></span><span class="chev">${I.chev}</span></button>
-      <button data-go="pocket:${p.id}" style="text-align:left">${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}</button>${info}
+      <button data-go="pocket:${p.id}" style="text-align:left">${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}</button>
       ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}</section>`;
   };
-  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="cards-grid">${act.map(card).join('')}</div>
-  ${U.viewing?'':'<button class="btn ghost wide" data-a="newPocket">+ Ajouter une poche</button>'}
+  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="cards-grid">${act.map(card).join('')}${goals.map(g=>goalCard(g)).join('')}</div>
+  ${U.viewing?'':'<button class="btn ghost wide" data-a="addChoice">+ Ajouter</button>'}
   ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
 }
 function vPocket(){
@@ -2065,10 +2075,16 @@ function openSave(arg,o={}){
   });
 }
 /* ---------- Objectifs ---------- */
+function ensureSavingPocket(){
+  let sp=savingPockets();
+  if(sp.length)return sp[0].id;
+  const p={id:uid(),name:'Épargne',type:'epargne',ic:'sprout',show:true};
+  S.pockets.push(p);Store.core();
+  return p.id;
+}
 function openGoalForm(g,pocketHint){
   const sp=savingPockets();
-  if(!g&&!sp.length){toast('Crée d\u2019abord une poche de type épargne pour y ranger tes objectifs.');openPocketForm(null,{type:'epargne'});return}
-  const cur=g?goalPocket(g):(pocketHint&&isSaving(pocketHint)?pocketHint:sp[0].id);
+  const cur=g?goalPocket(g):(pocketHint&&isSaving(pocketHint)?pocketHint:(sp[0]||{id:ensureSavingPocket()}).id);
   const s=sheet(`<h2>${g?"Modifier l'objectif":'Nouvel objectif'}</h2><form novalidate>
     ${F.text('name','Nom',g?g.name:'',{ph:'Ex. Vacances',auto:true})}
     ${F.money('target','Montant cible',g?g.target:'')}
@@ -2541,6 +2557,17 @@ function vDebts(){
   <section class="blk"><div class="sec"><h2>Détail de chaque crédit</h2></div><div class="stack">${list.map(({b})=>billCard(b)).join('')}</div></section>`;
 }
 
+/* ---------- Choix : nouvelle poche ou nouvel objectif ---------- */
+function openAddChoice(){
+  const s=sheet(`<h2>Ajouter</h2><p class="sub">Une poche range ton argent. Un objectif fixe un montant à atteindre.</p>
+    <div class="choice-list">
+      <button class="choice" data-c="pocket">${tileHTML('wallet')}<span class="mid"><span class="nm">Créer une poche</span><span class="s">Ex. Salaire, Vacances, Voiture</span></span><span class="chev">${I.chev}</span></button>
+      <button class="choice" data-c="goal">${tileHTML('target')}<span class="mid"><span class="nm">Créer un objectif</span><span class="s">Un montant à atteindre, sans créer de poche</span></span><span class="chev">${I.chev}</span></button>
+    </div>`);
+  s.querySelector('[data-c="pocket"]').onclick=()=>openPocketForm(null);
+  s.querySelector('[data-c="goal"]').onclick=()=>openGoalForm(null);
+}
+
 /* ---------- Réglages ---------- */
 const SET_CATS={show:['Affichage','list'],notif:['Notifications','bell'],pay:['Paiements','card'],sec:['Sécurité','shield'],share:['Gestion des accès','users'],look:['Apparence','contrast'],data:['Données','data']};
 function vSettings(){
@@ -2967,7 +2994,7 @@ const ACT={
   addPurchase:el=>openPurchase({pocket:el.dataset.id}),
   addBill:()=>openBillForm(null),addCredit:()=>openBillForm(null,{type:'credit'}),addFuture:()=>openBillForm(null,{future:true}),
   addGoal:el=>openGoalForm(null,el.dataset.id),goal:el=>openGoal(el.dataset.id),
-  newPocket:()=>openPocketForm(null),editPocket:el=>{const p=pocketById(el.dataset.id);if(p)openPocketForm(p)},
+  newPocket:()=>openPocketForm(null),addChoice:()=>openAddChoice(),editPocket:el=>{const p=pocketById(el.dataset.id);if(p)openPocketForm(p)},
   restorePocket:el=>{const p=pocketById(el.dataset.id);if(p){p.archived=false;Store.core();render();toast(`${pName(p.id)} est de retour.`)}},
   later:el=>{const o=occById(el.dataset.id);if(o)openLater(o)},
   accentPick:el=>{S.settings.accent=el.dataset.id;Store.core();applyTheme();render()},
