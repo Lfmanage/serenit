@@ -1069,7 +1069,28 @@ function loanStats(b){
   const paid=S.occ.filter(o=>o.billId===b.id&&o.status==='paid').reduce((s,o)=>s+o.amount,0);
   const total=(b.loan&&b.loan.total)||0,already=(b.loan&&b.loan.already)||0;
   const repaid=Math.min(total,already+paid);
-  return {total,repaid,remaining:Math.max(0,total-repaid),pct:total?repaid/total*100:0};
+  return {total,repaid,remaining:Math.max(0,total-repaid),pct:total?repaid/total*100:0,paidSince:paid};
+}
+/* ---------- Vue d'ensemble des dettes (crédits actifs) ---------- */
+function debts(){return S.bills.filter(b=>!b.deleted&&b.type==='credit')}
+function debtsOverview(){
+  const list=debts().map(b=>({b,ls:loanStats(b)}));
+  const totalRemaining=list.reduce((s,x)=>s+x.ls.remaining,0);
+  const paidSince=list.reduce((s,x)=>s+x.ls.paidSince,0);
+  const totalStart=list.reduce((s,x)=>s+Math.max(0,x.ls.total-((x.b.loan&&x.b.loan.already)||0)),0);
+  const monthly=list.reduce((s,x)=>s+(x.ls.remaining>0?x.b.amount:0),0);
+  return {list,totalRemaining,paidSince,totalStart,monthly};
+}
+/* Mois où la dette serait effacée, à un effort mensuel donné (somme des mensualités actives + effort supplémentaire) */
+function payoffMonths(totalRemaining,monthlyEffort){
+  if(totalRemaining<=0)return 0;
+  if(monthlyEffort<=0)return Infinity;
+  return Math.ceil(totalRemaining/monthlyEffort);
+}
+function addMonthsLabel(n){
+  if(n===Infinity)return null;
+  const d=addMonths(startOfMonth(today()),n);
+  return cap(fMonth.format(parseISO(d)));
 }
 function horizonEnd(){
   const t=today();
@@ -1509,6 +1530,7 @@ function vBills(){
   const tab=U.billsTab,t=today();
   const back=`<button class="round" data-a="billsTab" data-id="month" aria-label="Retour aux échéances du mois">${I.back}</button>`;
   const hdr2=(title,sub)=>`<header class="top">${back}<div style="flex:1;min-width:0"><h1>${esc(title)}</h1>${sub?`<p class="sub">${esc(sub)}</p>`:''}</div></header>`;
+  if(tab==='dettes')return vDebts();
   if(tab==='credits'){
     const l=S.bills.filter(b=>b.type==='credit'&&!b.deleted);
     return hdr2('Mes crédits')+(l.length?`<div class="stack">${l.map(billCard).join('')}</div>`:'<p class="empty">Aucun crédit enregistré.</p>')+(U.viewing?'':'<div style="margin-top:18px"><button class="btn ghost wide" data-a="addCredit">+ Ajouter un crédit</button></div>');
@@ -1537,7 +1559,7 @@ function vBills(){
   const tip=S.settings.swipeTip&&(todo.length||urg.length)&&!U.viewing?'<p class="hint" style="margin:0 2px 10px">Astuce : touche une échéance pour voir son détail. Glisse-la vers la droite pour la marquer payée, vers la gauche pour la payer plus tard.</p>':'';
   const any=urg.length||todo.length||paid.length||paused.length||pausedBills.length;
   const links=[];
-  if(showOn('credits')&&S.bills.some(b=>b.type==='credit'&&!b.deleted))links.push('<button class="chip" data-a="billsTab" data-id="credits">Mes crédits</button>');
+  if(showOn('credits')&&debts().length)links.push('<button class="chip" data-a="billsTab" data-id="dettes">Mes dettes</button>');
   if(S.bills.some(b=>!b.deleted&&b.future&&b.firstDue>t))links.push('<button class="chip" data-a="billsTab" data-id="future">Prélèvements futurs</button>');
   if(S.bills.some(b=>!b.deleted))links.push('<button class="chip" data-a="billsTab" data-id="all">Toutes mes échéances</button>');
   return `${hdrMain('Échéances',leftTotal?`${money(leftTotal)} à régler ${isCur?'ce mois-ci':'en '+monthName(from)}`:'')}
@@ -2447,6 +2469,35 @@ function openCatDetail(cid){
     ${txGroups(l)||'<p class="empty">Aucune opération.</p>'}`);
 }
 
+/* ---------- Écran « Mes dettes » : vue d'ensemble et projection ---------- */
+function vDebts(){
+  const {list,totalRemaining,paidSince,totalStart,monthly}=debtsOverview();
+  const pct=totalStart>0?Math.min(100,(totalStart-totalRemaining)/totalStart*100):0;
+  const extra=U.debtExtra||0;
+  const months=payoffMonths(totalRemaining,monthly+extra);
+  const eta=addMonthsLabel(months);
+  const back=`<button class="round" data-a="billsTab" data-id="month" aria-label="Retour aux échéances">${I.back}</button>`;
+  if(!list.length)return `<header class="top">${back}<div style="flex:1"><h1>Mes dettes</h1></div></header><p class="empty">Aucun crédit enregistré. Ajoute un crédit depuis Échéances pour suivre son remboursement ici.</p>`;
+  return `<header class="top">${back}<div style="flex:1"><h1>Mes dettes</h1></div></header>
+  <section class="hero compact debt-hero enter">
+    <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
+    <span class="lbl-top">RESTE À REMBOURSER</span><span class="big">${money(totalRemaining)}</span>
+    ${paidSince>0?`<span class="say"><i class="calm"></i>${money(paidSince)} remboursés depuis que tu suis ça ici.</span>`:''}
+    ${totalStart>0?`<div class="bar" style="margin-top:14px">${barHTML('debt-total',pct,false,true)}</div><span class="s" style="display:block;margin-top:2px">${fmtPct(pct)} remboursés au total</span>`:''}
+  </section>
+  <section class="blk"><div class="sec"><h2>Quand seras-tu libéré ?</h2></div>
+    <div class="mcard eta-card">
+      <div class="kv"><span>Avec tes mensualités actuelles (${money(monthly)}/mois)</span><b>${eta?esc(eta):'—'}</b></div>
+      <label class="f" style="padding:14px 0 6px"><span>Et si tu mettais un peu plus chaque mois ?</span>
+        <input type="range" min="0" max="30000" step="1000" data-debt-extra value="${extra}" aria-label="Effort supplémentaire par mois">
+      </label>
+      <div class="kv" style="border:0"><span>+ ${money(extra)}/mois → dette effacée</span><b class="pos">${extra>0&&eta?esc(addMonthsLabel(months)):eta?esc(eta):'—'}</b></div>
+    </div>
+    <p class="s" style="margin:8px 4px 0">Estimation simple, à mensualités égales. Si un taux d'intérêt s'applique, le remboursement réel peut prendre un peu plus longtemps.</p>
+  </section>
+  <section class="blk"><div class="sec"><h2>Détail de chaque crédit</h2></div><div class="stack">${list.map(({b})=>billCard(b)).join('')}</div></section>`;
+}
+
 /* ---------- Réglages ---------- */
 const SET_CATS={show:['Affichage','list'],notif:['Notifications','bell'],pay:['Paiements','card'],sec:['Sécurité','shield'],share:['Gestion des accès','users'],look:['Apparence','contrast'],data:['Données','data']};
 function vSettings(){
@@ -2944,6 +2995,7 @@ document.addEventListener('input',e=>{
   const el=e.target;
   if(el.id==='q'){U.q=el.value;U.histLimit=80;$('#histList').innerHTML=histList()}
   if(el.matches('input[type=range][data-set]')){const v=(+el.value)/100;Sound.setVol('fx',v)}
+  if(el.matches('input[data-debt-extra]')){U.debtExtra=+el.value;const kv=el.closest('.eta-card').querySelectorAll('.kv')[1];const {list,totalRemaining,monthly}=debtsOverview();const months=payoffMonths(totalRemaining,monthly+U.debtExtra),eta=addMonthsLabel(months);kv.innerHTML=`<span>+ ${money(U.debtExtra)}/mois → dette effac\u00e9e</span><b class="pos">${eta?esc(eta):'—'}</b>`}
 });
 
 /* ---------- Démarrage ---------- */
