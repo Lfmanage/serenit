@@ -2404,7 +2404,6 @@ function openPocketForm(p,o={}){
     e.preventDefault();const d=readForm(f),name=(d.name||'').trim().slice(0,30);
     if(!setErr(f,'name',name?'':'Donne un nom à ta poche.'))return;
     if(activePockets().some(x=>x!==p&&pUpper(x.name)===pUpper(name))){setErr(f,'name','Une poche porte déjà ce nom.');return}
-    if(p&&p.type==='epargne'&&curType!=='epargne'&&S.goals.some(g=>goalPocket(g)===p.id)){setErr(f,'name','Cette poche contient des objectifs : déplace-les avant de la passer en poche courante.');return}
     if(isNew){
       const start=d.start?parseMoney(d.start,true):0;
       if(isNaN(start)){setErr(f,'start','Montant invalide.');return}
@@ -2412,6 +2411,7 @@ function openPocketForm(p,o={}){
       if(start)addTx({d:today(),a:start,p:np.id,k:'ouverture',l:'Solde de départ'});
       Store.core();closeSheet();render();toast(`Poche ${pUpper(name)} créée.`);
     }else{
+      if(p.type==='epargne'&&curType!=='epargne')S.goals.forEach(g=>{if(goalPocket(g)===p.id)g.pocket=null});
       Object.assign(p,{name,type:curType,ic,show:!!d.show});Store.core();closeSheet();render();toast('Poche enregistrée.');
     }
   });
@@ -2423,8 +2423,8 @@ function openArchive(p){
   if(!others.length){toast('Garde au moins une poche active.');return}
   const v=balance(p.id),bills=S.bills.filter(b=>!b.deleted&&b.pocket===p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id);
   const needDest=v!==0||bills.length||goals.length;
-  const destOpts=(goals.length?others.filter(x=>x.type==='epargne'):others).map(x=>[x.id,pName(x.id)]);
-  if(needDest&&!destOpts.length){toast('Crée d\u2019abord une autre poche épargne pour y déplacer les objectifs.');return}
+  const destOpts=others.map(x=>[x.id,pName(x.id)]);
+  if(needDest&&!destOpts.length){toast('Crée d\u2019abord une autre poche pour y déplacer le solde.');return}
   const lines=[v?`son solde de ${money(v)}`:'',bills.length?`${bills.length} échéance${bills.length>1?'s':''}`:'',goals.length?`${goals.length} objectif${goals.length>1?'s':''}`:''].filter(Boolean);
   const s=sheet(`<h2>Archiver ${esc(pName(p.id))}</h2><p class="sub">Elle disparaît de tes écrans, mais son historique est conservé. Tu pourras la restaurer.</p><form novalidate>
     ${needDest?`<p class="hint" style="margin:0 0 12px">Avant d'archiver, on déplace ${lines.join(', ')} vers une autre poche.</p>${F.select('dest','Vers',destOpts,destOpts[0][0])}`:''}
@@ -2515,14 +2515,18 @@ function openDeletePocket(p){
   if(v<0){toast('Cette poche est sous zéro : corrige d\u2019abord son solde.');return}
   const bills=S.bills.filter(b=>!b.deleted&&b.pocket===p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id),recs=S.recurring.filter(r=>r.pocket===p.id);
   const hasTx=allTx().some(t=>t.p===p.id);
-  const needDest=v>0||bills.length||goals.length||recs.length;
-  let destOpts=(goals.length?others.filter(x=>x.type==='epargne'):others).map(x=>[x.id,pName(x.id)]);
-  if(needDest&&!destOpts.length){toast('Crée d\u2019abord une autre poche épargne pour y rattacher ses objectifs.');return}
-  const moves=[v>0?`son solde de ${money(v)} (transfert obligatoire)`:'',bills.length?`${bills.length} échéance${bills.length>1?'s':''}`:'',goals.length?`${goals.length} objectif${goals.length>1?'s':''}`:'',recs.length?`${recs.length} revenu${recs.length>1?'s':''} automatique${recs.length>1?'s':''}`:''].filter(Boolean);
+  /* Les objectifs sont indépendants des poches : ils ne bloquent jamais une suppression
+     et n'ont pas besoin d'une poche épargne de destination. Leur progression (calculée
+     sur les opérations passées) reste intacte quoi qu'il arrive à la poche. */
+  const needDest=v>0||bills.length||recs.length;
+  const destOpts=others.map(x=>[x.id,pName(x.id)]);
+  if(needDest&&!destOpts.length){toast('Crée d\u2019abord une autre poche pour y rattacher son solde ou ses échéances.');return}
+  const moves=[v>0?`son solde de ${money(v)} (transfert obligatoire)`:'',bills.length?`${bills.length} échéance${bills.length>1?'s':''}`:'',recs.length?`${recs.length} revenu${recs.length>1?'s':''} automatique${recs.length>1?'s':''}`:''].filter(Boolean);
   const s=sheet(`<h2>Supprimer ${esc(pName(p.id))}</h2>
     <p class="sub">${hasTx?'Ses anciennes opérations restent dans ton historique et tes statistiques, avec la mention « Poche supprimée ».':'Cette poche n\u2019a aucune opération : elle sera simplement supprimée.'}</p>
     <form novalidate>
     ${needDest?`<p class="hint" style="margin:0 0 12px">Avant la suppression, on rattache à une autre poche : ${moves.join(', ')}.</p>${F.select('dest','Vers la poche',destOpts,destOpts[0][0])}`:''}
+    ${goals.length?`<p class="hint" style="margin:0 0 12px">${goals.length>1?`Ses ${goals.length} objectifs restent`:`Son objectif « ${esc(goals[0].name)} » reste`} intact${goals.length>1?'s':''} et indépendant${goals.length>1?'s':''} de toute poche : ${goals.length>1?'leur':'sa'} progression ne change pas.</p>`:''}
     ${hasTx?`<label class="check"><input type="checkbox" name="ok"><span>J'ai compris : la poche est supprimée définitivement, son historique est conservé.</span></label><em class="err" data-err="ok"></em>`:''}
     <button class="btn danger block" type="submit">Supprimer définitivement</button></form>`);
   const f=s.querySelector('form');
@@ -2531,10 +2535,8 @@ function openDeletePocket(p){
     if(hasTx&&!f.ok.checked){setErr(f,'ok','Coche la case pour confirmer.');return}
     const dest=needDest?f.querySelector('[name=dest]').value:null;
     if(v>0&&!addTransfer(p.id,dest,v,today(),`Virement vers ${pName(dest)}`,`Virement depuis ${pName(p.id)}`))return;
-    if(dest){
-      goals.forEach(g=>g.pocket=dest);
-      bills.forEach(b=>b.pocket=dest);recs.forEach(r=>r.pocket=dest);
-    }
+    if(dest){bills.forEach(b=>b.pocket=dest);recs.forEach(r=>r.pocket=dest)}
+    goals.forEach(g=>g.pocket=null);
     S.removedPockets=S.removedPockets||{};S.removedPockets[p.id]=p.type;
     S.pockets=S.pockets.filter(x=>x.id!==p.id);
     Store.core();closeSheet();
