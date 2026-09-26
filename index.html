@@ -661,6 +661,15 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 .cards-grid .goal{border:1.5px dashed var(--line);box-shadow:none;background:var(--surface-2)}
 
 
+
+/* Poches : liste repliable, une seule ouverte à la fois (même style que les échéances/crédits) */
+.plist{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.pocket-row .xhead .nm{flex-direction:column;align-items:flex-start;gap:1px;font-weight:600}
+.pocket-row .xhead .nm .s{font-size:12.5px;font-weight:400;color:var(--ink-2)}
+.pocket-row .xhead .v{font-family:var(--serif);font-size:18px}
+.pocket-open{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding-top:2px}
+.pocket-open .amt-xl{font-family:var(--serif);font-size:36px}
+
 /* Accueil, sur téléphone : interface fortement compactée, sans changer le design */
 @media (max-width:959px){
   body[data-view="home"] .home-grid{gap:0}
@@ -962,7 +971,7 @@ function normalize(c){
 let S=null;       // réglages, échéances, objectifs, notifications
 let TX={};        // opérations rangées par mois : {"2026-09":[...]}
 let _all=null;
-const U={openCards:new Set(),openRows:new Set(),billMonth:null,discreet:false,setCat:null,anDetails:false,cmpCats:false,view:'home',stack:[],billsTab:'month',pocket:'salaire',hf:'all',q:'',histLimit:80,anTab:'apercu',anMode:'month',anAnchor:today(),anCustom:null,openCat:null,cmpA:null,cmpB:null,firstHome:true};
+const U={openPocket:null,openCards:new Set(),openRows:new Set(),billMonth:null,discreet:false,setCat:null,anDetails:false,cmpCats:false,view:'home',stack:[],billsTab:'month',pocket:'salaire',hf:'all',q:'',histLimit:80,anTab:'apercu',anMode:'month',anAnchor:today(),anCustom:null,openCat:null,cmpA:null,cmpB:null,firstHome:true};
 const LASTW={};
 let DL=null; // capacité de téléchargement
 
@@ -1659,17 +1668,22 @@ function pocketActions(p){
   if(p.type==='epargne')return `<button class="btn" data-a="transfer" data-id="from:${p.id}">Transférer</button>${showOn('epargne')?`<button class="btn ghost" data-a="saveMoney" data-id="to:${p.id}">Mettre de côté</button>`:''}`;
   return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter de l'argent</button>${activePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${p.id}">Transférer</button>`:''}`;
 }
+function pocketRow(p){
+  const open=U.openPocket===p.id,v=balance(p.id);
+  return `<article class="xc pocket-row${open?' open':''}" data-pocket-card="${p.id}" style="view-transition-name:pk-${p.id}">
+    <button class="xhead" data-a="togglePocket" data-id="${p.id}" aria-expanded="${open}">${tileHTML(pIcon(p.id),'sm')}<span class="nm"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Poche courante'}</span></span><span class="v ${balCls(v)}">${countHTML('bal:'+p.id,v)}</span><span class="chev">${I.chev}</span></button>
+    <div class="xmore"><div class="xin pocket-open">
+      ${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}
+      ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}
+    </div></div>
+  </article>`;
+}
 function vPockets(){
   const act=activePockets(),arch=S.pockets.filter(p=>p.archived);
   const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
   const goals=showOn('objectifs')?S.goals.slice():[];
-  const card=p=>{
-    const v=balance(p.id);
-    return `<section class="pbig" style="view-transition-name:pk-${p.id}"><button class="head" data-go="pocket:${p.id}" style="text-align:left">${tileHTML(pIcon(p.id))}<span style="flex:1;display:flex;flex-direction:column"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Poche courante'}</span></span><span class="chev">${I.chev}</span></button>
-      <button data-go="pocket:${p.id}" style="text-align:left">${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}</button>
-      ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}</section>`;
-  };
-  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="cards-grid">${act.map(card).join('')}${goals.map(g=>goalCard(g)).join('')}</div>
+  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="plist">${act.map(pocketRow).join('')}</div>
+  ${goals.length?`<div class="cards-grid" style="margin-top:14px">${goals.map(g=>goalCard(g)).join('')}</div>`:''}
   ${U.viewing?'':'<button class="btn ghost wide" data-a="addChoice">+ Ajouter</button>'}
   ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
 }
@@ -3019,6 +3033,7 @@ function go(t){
   withVT(()=>{
     if(TABS.some(x=>x[0]===v))U.stack=[];
     else U.stack.push(U.view==='pocket'?'pocket:'+U.pocket:U.view);
+    if(v==='pockets'&&U.view!=='pockets')U.openPocket=null;
     U.view=v;
     if(v==='bills'&&arg)U.billsTab=arg;
     if(v==='pocket')U.pocket=arg;
@@ -3057,6 +3072,7 @@ const ACT={
   anDetails:()=>{U.anDetails=!U.anDetails;render()},
   cmpCats:()=>{U.cmpCats=!U.cmpCats;render()},
   toggleCard:el=>{const id=el.dataset.id,c=el.closest('.xc');const open=!U.openCards.has(id);if(open)U.openCards.add(id);else U.openCards.delete(id);if(c)c.classList.toggle('open',open);el.setAttribute('aria-expanded',open)},
+  togglePocket:el=>{const id=el.dataset.id,c=el.closest('.pocket-row'),open=U.openPocket!==id;U.openPocket=open?id:null;$$('.plist .pocket-row').forEach(x=>{const isThis=x.dataset.pocketCard===id;const willOpen=isThis&&open;x.classList.toggle('open',willOpen);const h=x.querySelector('.xhead');if(h)h.setAttribute('aria-expanded',willOpen)})},
   toggleRow:el=>{const id=el.dataset.id,c=el.closest('.pctrow');const open=!U.openRows.has(id);if(open)U.openRows.add(id);else U.openRows.delete(id);if(c)c.classList.toggle('open',open);el.setAttribute('aria-expanded',open)},
   pauseBill:async el=>{const b=billById(el.dataset.id);if(!b)return;if(!await ask('Mettre en pause ?',`${b.name} ne sera plus débité, ni compté comme en retard, jusqu\u2019à ce que tu le reprennes.`,{ok:'Mettre en pause'}))return;pauseBill(b);closeSheet(true);render();toast(`${b.name} est en pause.`)},
   resumeBill:el=>{const b=billById(el.dataset.id);if(!b)return;resumeBill(b);closeSheet(true);render();toast(`${b.name} reprend normalement.`)},
