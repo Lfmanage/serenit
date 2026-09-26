@@ -663,27 +663,31 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 
 /* Accueil, sur téléphone : interface fortement compactée, sans changer le design */
 @media (max-width:959px){
-  body[data-view="home"] .blk{margin-bottom:20px}
-  body[data-view="home"] .sec{margin-bottom:8px}
-  body[data-view="home"] .stack{gap:8px}
-  body[data-view="home"] .list{padding:0 14px}
-  body[data-view="home"] .op{padding:10px 0;gap:12px}
-  body[data-view="home"] .op .nm{font-size:15px}
-  body[data-view="home"] .op .s{font-size:12.5px}
-  body[data-view="home"] .acc{padding:10px 0;gap:12px}
-  body[data-view="home"] .acc .nm{font-size:14.5px}
-  body[data-view="home"] .acc .amt{font-size:17px}
-  body[data-view="home"] .due{padding:10px 12px;gap:12px}
-  body[data-view="home"] .due .nm{font-size:14.5px}
-  body[data-view="home"] .due .s{font-size:12px}
+  body[data-view="home"] .home-grid{gap:0}
+  body[data-view="home"] .blk{margin-bottom:14px}
+  body[data-view="home"] .sec{margin-bottom:6px}
+  body[data-view="home"] .stack{gap:6px}
+  body[data-view="home"] .list{padding:0 12px}
+  body[data-view="home"] .op{padding:8px 0;gap:10px}
+  body[data-view="home"] .op .nm{font-size:14.5px;line-height:1.2}
+  body[data-view="home"] .op .s{font-size:12px}
+  body[data-view="home"] .acc{padding:8px 0;gap:10px}
+  body[data-view="home"] .acc .nm{font-size:14px}
+  body[data-view="home"] .acc .amt{font-size:16px}
+  body[data-view="home"] .due{padding:8px 10px;gap:10px}
+  body[data-view="home"] .due .nm{font-size:14px}
+  body[data-view="home"] .due .s{font-size:11.5px}
   body[data-view="home"] .due .date{gap:0}
-  body[data-view="home"] .due .date b{font-size:16px}
-  body[data-view="home"] .due .date span{font-size:10px}
-  body[data-view="home"] .due .end .v{font-size:14.5px}
-  body[data-view="home"] .chip-st{font-size:10px;padding:3px 8px}
-  body[data-view="home"] .goal{padding:14px;gap:8px}
-  body[data-view="home"] .goal .s{font-size:12.5px}
-  body[data-view="home"] .goal .pct{font-size:14px}
+  body[data-view="home"] .due .date b{font-size:15px}
+  body[data-view="home"] .due .date span{font-size:9.5px}
+  body[data-view="home"] .due .end .v{font-size:14px}
+  body[data-view="home"] .chip-st{font-size:9.5px;padding:2px 7px}
+  body[data-view="home"] .goal{padding:12px;gap:6px}
+  body[data-view="home"] .goal .s{font-size:12px}
+  body[data-view="home"] .goal .pct{font-size:13.5px}
+  body[data-view="home"] .goal .bar{height:6px}
+  body[data-view="home"] .qa{margin-bottom:6px}
+  body[data-view="home"] .sec h2{font-size:19px}
 }
 
 /* Statistiques simplifiées */
@@ -707,12 +711,17 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 
 
 /* Carte du solde compacte */
-.hero.compact{padding:18px 20px 16px;margin:4px 0 22px;border-radius:26px}
-.hero.compact .lbl-top{font-size:11.5px;margin-bottom:2px}
-.hero.compact .big{font-size:clamp(30px,9vw,38px);line-height:1.1}
-.hero.compact .say{margin:8px 0 0;font-size:13.5px;line-height:1.3;gap:8px}
-.hero.compact .say i{width:7px;height:7px}
-.hero.compact .after{display:block;margin-top:8px;padding:4px 0;font-size:12.5px;line-height:1.4;color:var(--ink-2);text-align:left}
+.hero.compact{padding:14px 18px 13px;margin:4px 0 16px;border-radius:24px}
+.hero.compact .lbl-top{font-size:11px;margin-bottom:1px}
+.hero.compact .big{font-size:clamp(26px,8vw,32px);line-height:1.08}
+.hero.compact .say{display:none}
+.hero.compact .after{display:block;margin-top:5px;padding:2px 0;font-size:12px;line-height:1.35;color:var(--ink-2);text-align:left}
+@media (max-width:959px){
+  .hero.compact{padding:12px 16px 10px;margin:4px 0 16px;border-radius:22px}
+  .hero.compact .lbl-top{font-size:10px;margin-bottom:1px}
+  .hero.compact .big{font-size:clamp(20px,6.5vw,24px);line-height:1.15}
+  .hero.compact .after{margin-top:4px;padding:2px 0;font-size:11.5px;line-height:1.35}
+}
 .hero.compact .after b{white-space:nowrap}
 .hero.compact .after b{font-weight:600;color:var(--ink)}
 .hero.compact .after b.neg{color:var(--bad)}
@@ -1228,8 +1237,12 @@ function unpayOcc(o){if(o.txId)removeTx(o.txId);o.status='todo';delete o.paidAt;
 function isUrgent(o){return o.status==='todo'&&(!!o.later||o.due<today())}
 
 /* ---------- Objectifs et prévision ---------- */
-function plannedSavings(){
-  const m=monthKey(today()),out=[];
+function plannedSavings(horizon){
+  /* Une épargne mensuelle n'est comptée dans la prévision que lorsque l'échéance
+     du mois (sa fin) tombe dans la période affichée : sinon elle s'afficherait
+     « déjà » dès le 1er du mois, alors que la prévision ne porte que sur quelques jours. */
+  const m=monthKey(today()),out=[],due=endOfMonth(today());
+  if(horizon&&due>horizon)return out;
   for(const g of S.goals){
     if(!g.monthly)continue;
     const saved=goalSaved(g.id);if(saved>=g.target)continue;
@@ -1243,7 +1256,7 @@ function forecast(){
   const h=horizonEnd();
   const occ=todoOcc().filter(o=>o.due<=h||o.later);
   const ech=occ.reduce((s,o)=>s+o.amount,0);
-  const plans=plannedSavings(),ep=plans.reduce((s,p)=>s+p.amount,0);
+  const plans=plannedSavings(h),ep=plans.reduce((s,p)=>s+p.amount,0);
   const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
   return {h,occ,ech,plans,ep,soldes:total,dispo:total-ech-ep,total};
 }
@@ -1563,7 +1576,7 @@ function totalColorStyle(v){
 function vHome(){
   const f=forecast(),h=new Date().getHours(),name=(S.settings.name||'').trim();
   const hello=U.viewing?`Poches de ${U.viewing.name||'ton proche'}`:(h<5||h>=18?'Bonsoir':'Bonjour')+(name?' '+name:'');
-  const sum=dueSummary(),urg=showOn('urgent')?todoOcc().filter(isUrgent):[],urgTotal=urg.reduce((s,o)=>s+o.amount,0);
+  const urg=showOn('urgent')?todoOcc().filter(isUrgent):[],urgTotal=urg.reduce((s,o)=>s+o.amount,0);
   const shown=activePockets().filter(p=>p.show!==false);
   const up=showOn('echeances')?upcoming(3):[];
   const recent=[];const seenLink=new Set();
@@ -1578,7 +1591,6 @@ function vHome(){
   <section class="hero compact enter" aria-label="Situation générale">
     <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
     ${showOn('total')?`<span class="lbl-top">SOLDE TOTAL</span><button class="bigbtn" data-a="discreet" style="${totalColorStyle(f.total)}" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('total',f.total,'big')}</button>`:''}
-    <span class="say"><i class="${sum.cls}"></i>${esc(sum.txt)}</span>
     ${showOn('dispo')?`<button class="after" data-a="forecast">Solde après prélèvements : <b class="${f.dispo<0?'neg':''}">${money(f.dispo)}</b>${I.chev}</button>`:''}
   </section>
   ${urg.length?`<button class="urgent-banner" data-a="urgentView">${tileHTML('alert','bad')}<span class="mid"><b>URGENT</b><span class="s">${urg.length>1?`${urg.length} paiements à régler, ${money(urgTotal)}`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
@@ -2665,6 +2677,7 @@ function applySetting(p){
   if(p==='soundVol')Sound.setVol('fx',st.soundVol);
   if(p==='sound')Sound.fx(st.sound);
   if(p==='horizon'||p==='payday'||p==='validation'||p==='autoDelay'||p==='autoCustom')runChecks();
+  if(p==='dailyTime'&&Store.mode==='supabase'&&Notification&&Notification.permission==='granted')syncPushSubscription();
   if(p.startsWith('show.'))buildNav();
 }
 function hexRgb(h){h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.slice(i,i+2),16))}
@@ -2818,10 +2831,30 @@ setInterval(()=>{
   const al=+S.settings.autolock;
   if(S.settings.pinHash&&al>0&&Date.now()-lastActive>al*60000){lockNow();return}
 },20000);
+function urlB64ToUint8Array(b64){
+  const pad='='.repeat((4-b64.length%4)%4),s=(b64+pad).replace(/-/g,'+').replace(/_/g,'/'),raw=atob(s),arr=new Uint8Array(raw.length);
+  for(let i=0;i<raw.length;i++)arr[i]=raw.charCodeAt(i);
+  return arr;
+}
+/* Enregistre (ou met à jour) l'abonnement Web Push de cet appareil dans Supabase,
+   pour que la « Question du jour » et les rappels puissent arriver même appli fermée. */
+async function syncPushSubscription(){
+  if(Store.mode!=='supabase'||!SB||!ACCOUNT||!CFG.vapidPublicKey||!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  try{
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(CFG.vapidPublicKey)});
+    const j=sub.toJSON(),tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Paris';
+    await SB.from('serenite_push_subs').upsert({user_id:ACCOUNT.id,endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,tz,daily_time:S.settings.dailyTime||'20:00',updated_at:new Date().toISOString()});
+  }catch(e){console.warn('push',e)}
+}
 async function askNotifPerm(){
   if(!('Notification' in window)){toast('Les notifications du téléphone ne sont pas disponibles ici.');return}
-  try{const r=await Notification.requestPermission();toast(r==='granted'?'Notifications activées.':'Les notifications sont bloquées dans cet affichage.')}
-  catch(e){toast('Les notifications du téléphone ne sont pas disponibles ici.')}
+  try{
+    const r=await Notification.requestPermission();
+    toast(r==='granted'?'Notifications activées.':'Les notifications sont bloquées dans cet affichage.');
+    if(r==='granted')await syncPushSubscription();
+  }catch(e){toast('Les notifications du téléphone ne sont pas disponibles ici.')}
   render();
 }
 
@@ -3119,6 +3152,7 @@ function startApp(core,tx,opts={}){
   if(!locked)afterEntry();
 }
 function afterEntry(){
+  if('Notification' in window&&Notification.permission==='granted')syncPushSubscription();
   if(helloShown){if(!S.onboarded)openOnboarding();return}
   helloShown=true;
   showHello(()=>{if(!S.onboarded)openOnboarding()});
