@@ -122,7 +122,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .grow{flex:1;min-width:0}
 .mini{min-height:40px;padding:0 14px;border-radius:12px;background:var(--surface-2);font-weight:500;font-size:14.5px;flex:none}
 .sheet .chips{margin:0 -22px 8px}
-.grp{font-size:14px;font-weight:500;color:var(--ink-2);margin:20px 2px 10px}
+.grp{font-size:13px;font-weight:500;color:var(--ink-2);margin:16px 2px 7px}
 .card{background:var(--surface);border-radius:24px;box-shadow:var(--shadow)}
 .stack{display:flex;flex-direction:column;gap:12px}
 .empty{padding:4px 2px;color:var(--ink-2);font-size:15px;line-height:1.45}
@@ -253,14 +253,14 @@ a{color:var(--brand-ink);text-decoration:none}
 
 /* Navigation flottante */
 .tabs{position:fixed;left:0;right:0;bottom:calc(14px + env(safe-area-inset-bottom,0px));z-index:30;padding:0 14px;pointer-events:none}
-.tabs nav{pointer-events:auto;max-width:500px;margin:0 auto;height:72px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;background:var(--bar);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:26px;box-shadow:var(--shadow-lg)}
-.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:60px;font-size:11.5px;font-weight:500;color:var(--ink-2)}
-.tabs button span{display:grid;place-items:center;width:52px;height:30px;border-radius:15px;transition:background .3s}
-.tabs button svg{width:22px;height:22px}
+.tabs nav{pointer-events:auto;max-width:500px;margin:0 auto;height:60px;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));align-items:center;background:var(--bar);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-radius:22px;box-shadow:var(--shadow-lg)}
+.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:48px;font-size:10.5px;font-weight:500;color:var(--ink-2)}
+.tabs button span{display:grid;place-items:center;width:46px;height:26px;border-radius:13px;transition:background .3s}
+.tabs button svg{width:20px;height:20px}
 .tabs button[aria-current="page"]{color:var(--brand-ink);font-weight:600}
 .tabs button[aria-current="page"] span{background:var(--brand-soft)}
-.fab{position:fixed;z-index:31;right:max(22px,calc(50% - 238px));bottom:calc(102px + env(safe-area-inset-bottom,0px));width:58px;height:58px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 14px 28px -12px var(--hero-shadow)}
-.fab svg{width:26px;height:26px}
+.fab{position:fixed;z-index:31;right:max(18px,calc(50% - 238px));bottom:calc(86px + env(safe-area-inset-bottom,0px));width:48px;height:48px;border-radius:50%;background:var(--brand);color:var(--on-brand);display:grid;place-items:center;box-shadow:0 14px 28px -12px var(--hero-shadow)}
+.fab svg{width:22px;height:22px}
 
 /* Feuilles */
 .scrim{position:fixed;inset:0;z-index:50;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center;opacity:0;transition:opacity .25s}
@@ -363,18 +363,18 @@ a{color:var(--brand-ink);text-decoration:none}
 .ncard .unread{position:absolute;top:14px;left:14px;width:9px;height:9px;border-radius:50%;background:var(--brand);border:2px solid var(--surface)}
 
 /* Réglages */
-.profile{display:flex;align-items:center;gap:16px;width:100%;text-align:left;padding:10px 4px 20px;color:var(--ink)}
+.profile{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:6px 4px 14px;color:var(--ink)}
 .profile .avatar{width:60px;height:60px;font-size:26px}
 .profile b{display:block;font-family:var(--serif);font-weight:400;font-size:24px}
-.srow{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink);min-height:64px}
+.srow{display:flex;align-items:center;gap:12px;width:100%;padding:10px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink);min-height:50px}
 .srow .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
-.srow .nm{font-size:16px;font-weight:500}
+.srow .nm{font-size:15px;font-weight:500}
 .srow select,.srow input[type=time],.srow input[type=number]{height:40px;border-radius:12px;border:0;background-color:var(--surface-2);padding:0 34px 0 12px;font-size:16px;max-width:55%;-webkit-appearance:none;appearance:none}
 .srow input[type=time],.srow input[type=number]{padding:0 10px;width:auto}
 .srow input[type=number]{width:72px}
 .srow input[type=range]{accent-color:var(--brand);width:46%}
 .srow .mini{min-height:40px;padding:0 14px;border-radius:12px;background:var(--surface-2);font-weight:500;font-size:14.5px;flex:none}
-.sgroup{padding:2px 18px;border-radius:26px;background:var(--surface);box-shadow:var(--shadow);margin-bottom:14px}
+.sgroup{padding:0 16px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);margin-bottom:10px}
 .sgroup>.srow:last-child{border-bottom:0}
 .sw{width:52px;height:32px;border-radius:99px;background:var(--surface-2);position:relative;flex:none;transition:background .3s}
 .sw::after{content:"";position:absolute;top:3px;left:3px;width:26px;height:26px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.22);transition:transform .3s cubic-bezier(.2,.8,.2,1)}
@@ -420,6 +420,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .evo.good{color:var(--pos)}.evo.bad{color:var(--bad)}.evo.flat{color:var(--ink-2);font-weight:500}
 .evo.big{font-family:var(--serif);font-weight:400;font-size:clamp(46px,14vw,62px);letter-spacing:-.02em;line-height:1.05}
 .evo.mid{font-family:var(--serif);font-weight:400;font-size:25px}
+.evo.sm{font-size:13px}
 .evo .ar{font-family:var(--sans);font-size:.72em;font-weight:600}
 .pctrow{display:flex;flex-direction:column;gap:4px;padding:16px 0;border-bottom:1px solid var(--line)}
 .pctrow:last-of-type{border-bottom:0}
@@ -435,7 +436,7 @@ a{color:var(--brand-ink);text-decoration:none}
 .btnrow .markpaid{margin-top:0}
 .later{min-height:44px;padding:0 16px;border-radius:14px;box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--bad) 45%,transparent);color:var(--bad);font-size:14.5px;font-weight:600;letter-spacing:.03em}
 .swatches{display:flex;gap:14px}
-.swatch{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
+.swatch{width:34px;height:34px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08)}
 .swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink)}
 .icon-pick{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:0 0 16px}
 .icon-pick button{height:50px;border-radius:14px;background:var(--surface);display:grid;place-items:center;color:var(--ink-2);box-shadow:var(--shadow)}
@@ -516,8 +517,8 @@ input,select,textarea{font-size:16px}
 .hero .say{margin:12px 0 0}
 .qa{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:-6px 0 28px}
 .qa button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:4px 2px;font-size:13px;font-weight:500;color:var(--ink);text-align:center;line-height:1.25}
-.qa button span{width:56px;height:56px;border-radius:20px;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--brand-ink)}
-.qa button span svg{width:24px;height:24px}
+.qa button span{width:46px;height:46px;border-radius:16px;background:var(--surface);box-shadow:var(--shadow);display:grid;place-items:center;color:var(--brand-ink)}
+.qa button span svg{width:20px;height:20px}
 .acc{display:flex;align-items:center;gap:14px;width:100%;padding:14px 0;border-bottom:1px solid var(--line);text-align:left;color:var(--ink)}
 .list>.acc:last-child{border-bottom:0}
 .acc .mid{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
@@ -525,8 +526,8 @@ input,select,textarea{font-size:16px}
 .acc .amt{font-family:var(--serif);font-size:19px;white-space:nowrap}
 .btns.four .btn:first-child{flex:1 1 100%}
 .btns.four .btn{flex:1 1 28%;padding:0 10px}
-.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:14px 8px}
-.swatch-b{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-2);text-align:center;line-height:1.2;min-height:64px}
+.swatch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(60px,1fr));gap:10px 6px}
+.swatch-b{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--ink-2);text-align:center;line-height:1.15;min-height:52px}
 .swatch-b .swatch{width:40px;height:40px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.08);transition:transform .2s}
 .swatch-b[aria-checked="true"]{color:var(--ink);font-weight:600}
 .swatch-b[aria-checked="true"] .swatch{box-shadow:0 0 0 3px var(--surface),0 0 0 5px var(--ink);transform:scale(1.05)}
@@ -700,6 +701,13 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
   body[data-view="home"] .qa{margin-bottom:6px}
   body[data-view="home"] .sec h2{font-size:19px}
 }
+
+
+.total-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.evo-badge{display:flex;flex-direction:column;align-items:flex-start;gap:0;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.5)}
+:root[data-theme="dark"] .evo-badge{background:rgba(255,255,255,.08)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .evo-badge{background:rgba(255,255,255,.08)}}
+.evo-badge small{font-size:10.5px;color:var(--ink-2);font-weight:500}
 
 /* Statistiques simplifiées */
 .stat-list{display:flex;flex-direction:column;gap:10px;margin:0 0 30px}
@@ -945,7 +953,7 @@ const BILL_SUGGEST=[['EDF','energie'],['Loyer','loyer'],['Assurance','assur-hab'
 function defaultSettings(){
   return {name:'',theme:'auto',animations:true,validation:'manual',autoDelay:3,autoCustom:5,horizon:'month',payday:28,soonDays:3,dailyTime:'20:00',
     notif:{soon:true,unpaid:true,late:true,credit:true,daily:true,goals:true,auto:true,summary:true,income:true},privacyBlur:true,discreetStart:false,swipeTip:true,
-    accent:'saumon',bg:'beige',totalColor:'vert',sound:'doux',soundVol:0.6,amb:{on:false},
+    accent:'saumon',bg:'beige',totalColor:'vert',navColor:'default',sound:'doux',soundVol:0.6,amb:{on:false},
     show:Object.fromEntries(SHOW_ITEMS.map(x=>[x[0],true])),
     pinHash:null,pinSalt:null,pinLen:4,bio:null,autolock:5};
 }
@@ -966,6 +974,7 @@ function normalize(c){
   if(TC_OLD[o.settings.totalColor])o.settings.totalColor=TC_OLD[o.settings.totalColor];
   if(!BGS.some(b=>b[0]===o.settings.bg))o.settings.bg='beige';
   if(!TOTAL_COLORS.some(b=>b[0]===o.settings.totalColor))o.settings.totalColor='vert';
+  if(o.settings.navColor!=='default'&&!ACCENTS.some(b=>b[0]===o.settings.navColor))o.settings.navColor='default';
   if(!ACCENTS.some(a=>a[0]===o.settings.accent))o.settings.accent='saumon';
   return o;
 }
@@ -1587,6 +1596,7 @@ function totalColorStyle(v){
 /* ---------- Accueil ---------- */
 function vHome(){
   const f=forecast(),h=new Date().getHours(),name=(S.settings.name||'').trim();
+  const mS=metrics(startOfMonth(today()),today()),prevTotal=f.total-mS.net;
   const hello=U.viewing?`Poches de ${U.viewing.name||'ton proche'}`:(h<5||h>=18?'Bonsoir':'Bonjour')+(name?' '+name:'');
   const urg=showOn('urgent')?todoOcc().filter(isUrgent):[],urgTotal=urg.reduce((s,o)=>s+o.amount,0);
   const shown=activePockets().filter(p=>p.show!==false&&!p.goalOnly);
@@ -1602,7 +1612,7 @@ function vHome(){
   return `<header class="top" style="align-items:flex-start"><div class="hello"><p>${esc(cap(fLong.format(new Date())))}</p><h1>${esc(hello)}</h1></div>${bellBtn()}<button class="avatar" data-go="settings" aria-label="Profil et réglages">${initial()}</button></header>
   <section class="hero compact enter" aria-label="Situation générale">
     <span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span><span class="ring r4"></span>
-    ${showOn('total')?`<span class="lbl-top">SOLDE TOTAL</span><button class="bigbtn" data-a="discreet" style="${totalColorStyle(f.total)}" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('total',f.total,'big')}</button>`:''}
+    ${showOn('total')?`<span class="lbl-top">SOLDE TOTAL</span><div class="total-row"><button class="bigbtn" data-a="discreet" style="${totalColorStyle(f.total)}" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('total',f.total,'big')}</button>${prevTotal!==0?`<span class="evo-badge">${evoHTML(f.total,prevTotal,true,'sm')}<small>ce mois-ci</small></span>`:''}</div>`:''}
     ${showOn('dispo')?`<button class="after" data-a="forecast">Solde après prélèvements : <b class="${f.dispo<0?'neg':''}">${money(f.dispo)}</b>${I.chev}</button>`:''}
   </section>
   ${urg.length?`<button class="urgent-banner" data-a="urgentView">${tileHTML('alert','bad')}<span class="mid"><b>URGENT</b><span class="s">${urg.length>1?`${urg.length} paiements à régler, ${money(urgTotal)}`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
@@ -1874,7 +1884,7 @@ function vAnalyse(){
   const {r,m,pm}=statRange(),keys=statKeys();
   const modes=[['week','Semaine'],['month','Mois'],['year','Année']];
   const top=catBreakdown(r.from,r.to).slice(0,3);
-  return `${hdrMain('Statistiques')}
+  return `${hdrMain('Stats')}
   <div class="seg" role="group" aria-label="Période">${modes.map(([k,l])=>`<button data-a="anMode" data-id="${k}" aria-pressed="${U.anMode===k}">${l}</button>`).join('')}</div>
   <div class="period"><button class="round" data-a="anShift" data-id="-1" aria-label="Période précédente">${I.back}</button><p class="l">${esc(r.label)}</p><button class="round" data-a="anShift" data-id="1" aria-label="Période suivante">${I.chev}</button></div>
   <div class="stat-list">${keys.map(k=>`<button class="stat" data-a="statDetail" data-id="${k}">${tileHTML(STAT_IC[k],'sm'+(k==='depenses'?' neutral':''))}<span class="mid"><span class="lbl">${M_LABEL[k].toUpperCase()}</span><span class="v">${money(m[k])}</span></span><span class="chev">${I.chev}</span></button>`).join('')}</div>
@@ -2689,6 +2699,11 @@ function vSettings(){
     <h3 class="grp">Fond : ${esc(curB[1])}</h3>
     <div class="sgroup" style="padding:16px"><div class="swatch-grid" role="radiogroup" aria-label="Couleur du fond">${BGS.map(([k,l,hex])=>`<button class="swatch-b" role="radio" data-a="bgPick" data-id="${k}" aria-checked="${st.bg===k}"><span class="swatch bgsw" style="background:${hex}"></span><span>${esc(l)}</span></button>`).join('')}</div></div>
     ${st.bg==='anthracite'?'<p class="s" style="margin:-4px 4px 10px">Le gris anthracite active automatiquement le mode sombre, pour rester lisible.</p>':''}
+    <h3 class="grp">Couleur de la barre de navigation</h3>
+    <div class="sgroup" style="padding:16px"><div class="swatch-grid" role="radiogroup" aria-label="Couleur de la barre de navigation">
+      <button class="swatch-b" role="radio" data-a="navColorPick" data-id="default" aria-checked="${st.navColor==='default'}"><span class="swatch bgsw" style="background:var(--surface)"></span><span>Neutre</span></button>
+      ${ACCENTS.map(([k,l,hex])=>`<button class="swatch-b" role="radio" data-a="navColorPick" data-id="${k}" aria-checked="${st.navColor===k}"><span class="swatch" style="background:${hex}"></span><span>${esc(l)}</span></button>`).join('')}
+    </div></div>
     <h3 class="grp">Couleur du solde total</h3>
     <div class="sgroup" style="padding:16px"><div class="tc-grid" role="radiogroup" aria-label="Couleur du solde total">${TOTAL_COLORS.map(([k,l])=>`<button class="tc" role="radio" data-a="totalPick" data-id="${k}" aria-checked="${st.totalColor===k}"><b style="color:${tcColor(k)}">1 250 €</b><span>${esc(l)}</span></button>`).join('')}</div></div>
     <p class="s" style="margin:10px 4px 0">Les couleurs s'ajustent au fond choisi pour rester lisibles. Un solde négatif s'affiche toujours en rouge.</p>`;
@@ -2743,6 +2758,11 @@ function applyTheme(){
     '--halo-1':`rgba(${R},${G},${B},${dark?.12:.26})`,'--hero-shadow':dark?'rgba(0,0,0,.6)':`rgba(${R},${G},${B},.42)`,
     '--tc-custom':tcColor(S.settings.totalColor)
   };
+  if(S.settings.navColor!=='default'){
+    const na=ACCENTS.find(x=>x[0]===S.settings.navColor)||ACCENTS[0];
+    const nh=na[2],[nr,ng,nb]=hexRgb(nh);
+    v['--bar']=dark?`rgba(${nr},${ng},${nb},.32)`:`rgba(${nr},${ng},${nb},.22)`;
+  }
   for(const k in v)r.style.setProperty(k,v[k]);
   $('meta[name=theme-color]').setAttribute('content',bg);
 }
@@ -3013,7 +3033,7 @@ async function resetAll(){
 }
 
 /* ---------- Navigation ---------- */
-const TABS=[['home','Accueil',I.home],['bills','Échéances',I.cal],['pockets','Poches',I.wallet],['goals','Objectifs',I.target],['history','Historique',I.list],['analyse','Statistiques',I.chart]];
+const TABS=[['home','Accueil',I.home],['bills','Échéances',I.cal],['pockets','Poches',I.wallet],['goals','Objectifs',I.target],['history','Historique',I.list],['analyse','Stats',I.chart]];
 const TAB_SHOW={bills:'echeances',pockets:'poches',goals:'objectifs',history:'historique',analyse:'stats'};
 const tabOn=k=>!TAB_SHOW[k]||showOn(TAB_SHOW[k]);
 function buildNav(){
@@ -3098,6 +3118,7 @@ const ACT={
   unpay:el=>{const o=occById(el.dataset.id);if(!o)return;const f=o.txId&&findTx(o.txId);unpayOcc(o);render();toast('Paiement annulé, le montant est revenu sur la poche.')},
   billMonth:el=>{const bd=billMonthBounds();const m=monthKey(addMonths((U.billMonth||bd.cur)+'-01',+el.dataset.id));if(m<bd.min||m>bd.max)return;withVT(()=>{U.billMonth=m;render()})},
   bgPick:el=>{S.settings.bg=el.dataset.id;Store.core();applyTheme();render()},
+  navColorPick:el=>{S.settings.navColor=el.dataset.id;Store.core();applyTheme();render()},
   totalPick:el=>{S.settings.totalColor=el.dataset.id;Store.core();applyTheme();render()},
   pocketShow:el=>{const p=pocketById(el.dataset.id);if(!p)return;p.show=p.show===false;Store.core();render()},
   urgentView:()=>{if(showOn('echeances')){U.billMonth=null;go('bills:month')}else openUrgent()},
@@ -3215,16 +3236,7 @@ window.addEventListener('pagehide',privacyOn);
 document.addEventListener('visibilitychange',()=>{if(document.hidden)privacyOn();else privacyOff()});
 document.addEventListener('pointerdown',privacyOff,true);
 
-/* ---------- Bouton + qui s'efface quand on descend ---------- */
-/* ---------- Barre du bas : s'efface pendant le défilement, revient dès qu'on s'arrête ---------- */
-let lastY=0,scrollT=null;
-function barsShow(show){const t=$('#tabs'),f=$('#fab');if(t)t.classList.toggle('hide',!show);if(f)f.classList.toggle('away',!show)}
-window.addEventListener('scroll',()=>{
-  const y=window.scrollY,dy=y-lastY;lastY=y;
-  if(y<20){clearTimeout(scrollT);barsShow(true);return}
-  if(Math.abs(dy)>3)barsShow(false);
-  clearTimeout(scrollT);scrollT=setTimeout(()=>barsShow(true),280);
-},{passive:true});
+/* La barre du bas et le bouton + restent fixes en permanence, y compris pendant le défilement. */
 
 /* ---------- Glisser une échéance : droite = payé, gauche = payer plus tard ---------- */
 let sw=null;
