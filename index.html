@@ -584,8 +584,10 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 }
 
 /* Version 7 : cartes compactes dépliables, mois par mois, apparence */
-.tabs nav{grid-template-columns:repeat(5,minmax(0,1fr))}
 .tabs button{font-size:11px}
+.tabs nav[data-tabcount="6"] button{font-size:9.6px;gap:3px;letter-spacing:-.01em}
+.tabs nav[data-tabcount="6"] button span{width:22px;height:22px}
+@media (min-width:960px){.tabs nav[data-tabcount="6"] button{font-size:14.5px;gap:12px;letter-spacing:normal}.tabs nav[data-tabcount="6"] button span{width:34px;height:34px}}
 .xc{position:relative;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);transition:transform .35s cubic-bezier(.2,.8,.2,1),background .6s ease,box-shadow .3s}
 .xc[data-swipe]{touch-action:pan-y}
 .xc.dragging{transition:none!important}
@@ -892,6 +894,7 @@ const pUpper=n=>String(n||'').toLocaleUpperCase('fr-FR');
 const pName=id=>{if(!id)return '';const p=pocketById(id);return p?pUpper(p.name):'Poche supprimée'};
 const pIcon=id=>{const p=pocketById(id);return p?(p.ic||(p.type==='epargne'?'sprout':'wallet')):'wallet'};
 const activePockets=()=>S.pockets.filter(p=>!p.archived);
+const visiblePockets=()=>activePockets().filter(p=>!p.goalOnly);
 const courantPockets=()=>activePockets().filter(p=>p.type!=='epargne');
 const savingPockets=()=>activePockets().filter(p=>p.type==='epargne');
 const isSaving=id=>{const p=pocketById(id);if(p)return p.type==='epargne';return !!(S&&S.removedPockets&&S.removedPockets[id]==='epargne')};
@@ -1586,7 +1589,7 @@ function vHome(){
   const f=forecast(),h=new Date().getHours(),name=(S.settings.name||'').trim();
   const hello=U.viewing?`Poches de ${U.viewing.name||'ton proche'}`:(h<5||h>=18?'Bonsoir':'Bonjour')+(name?' '+name:'');
   const urg=showOn('urgent')?todoOcc().filter(isUrgent):[],urgTotal=urg.reduce((s,o)=>s+o.amount,0);
-  const shown=activePockets().filter(p=>p.show!==false);
+  const shown=activePockets().filter(p=>p.show!==false&&!p.goalOnly);
   const up=showOn('echeances')?upcoming(3):[];
   const recent=[];const seenLink=new Set();
   if(showOn('operations'))for(const t of allTx()){if(t.link){if(seenLink.has(t.link))continue;seenLink.add(t.link);const pair=allTx().filter(x=>x.link===t.link);recent.push(pair.find(x=>x.a<0)||t)}else recent.push(t);if(recent.length>=3)break}
@@ -1594,7 +1597,7 @@ function vHome(){
   const qa=[];
   if(showOn('achats'))qa.push(`<button data-a="addPurchase"><span>${I.cart}</span>Achat</button>`);
   qa.push(`<button data-a="income"><span>${I.arrowIn}</span>Ajouter de l'argent</button>`);
-  if(activePockets().length>1)qa.push(`<button data-a="transfer"><span>${I.swap}</span>Transférer</button>`);
+  if(visiblePockets().length>1)qa.push(`<button data-a="transfer"><span>${I.swap}</span>Transférer</button>`);
   qa.push(`<button data-a="newPocket"><span>${I.plus}</span>Nouvelle poche</button>`);
   return `<header class="top" style="align-items:flex-start"><div class="hello"><p>${esc(cap(fLong.format(new Date())))}</p><h1>${esc(hello)}</h1></div>${bellBtn()}<button class="avatar" data-go="settings" aria-label="Profil et réglages">${initial()}</button></header>
   <section class="hero compact enter" aria-label="Situation générale">
@@ -1609,7 +1612,7 @@ function vHome(){
   ${showOn('echeances')?`<section class="blk"><div class="sec"><h2>Prochaines échéances</h2><button class="more" data-go="bills">Tout voir</button></div>
     ${up.length?`<div class="stack">${up.map(dueMini).join('')}</div>`:'<p class="empty">Rien à payer dans les prochains jours.</p>'}</section>`:''}
   ${showOn('poches')?`<section class="blk"><div class="sec"><h2>Poches</h2><button class="more" data-go="pockets">Tout voir</button></div><div class="list">${shown.map(accRow).join('')}</div></section>`:''}
-  ${showOn('objectifs')&&S.goals.length?`<section class="blk"><div class="sec"><h2>Objectifs d'épargne</h2><button class="more" data-go="pocket:${goalPocket(S.goals[0])}">Tout voir</button></div><div class="stack">${S.goals.slice(0,2).map(g=>goalCard(g,{compact:true})).join('')}</div></section>`:''}
+  ${showOn('objectifs')?`<section class="blk"><div class="sec"><h2>Objectifs d'épargne</h2>${S.goals.length?'<button class="more" data-go="goals">Tout voir</button>':''}</div>${S.goals.length?`<div class="stack">${S.goals.slice(0,2).map(g=>goalCard(g,{compact:true})).join('')}</div>`:`<p class="empty">Aucun objectif pour le moment.</p>${U.viewing?'':'<button class="btn ghost wide" data-a="newGoal">+ Nouvel objectif</button>'}`}</section>`:''}
   ${showOn('operations')&&recent.length?`<section class="blk"><div class="sec"><h2>Opérations récentes</h2>${showOn('historique')?'<button class="more" data-go="history">Tout voir</button>':''}</div><div class="list">${recent.map(t=>txRow(t,{date:true})).join('')}</div></section>`:''}
   </div>`;
 }
@@ -1666,7 +1669,7 @@ function vBills(){
 /* ---------- Poches ---------- */
 function pocketActions(p){
   if(p.type==='epargne')return `<button class="btn" data-a="transfer" data-id="from:${p.id}">Transférer</button>${showOn('epargne')?`<button class="btn ghost" data-a="saveMoney" data-id="to:${p.id}">Mettre de côté</button>`:''}`;
-  return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter de l'argent</button>${activePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${p.id}">Transférer</button>`:''}`;
+  return `<button class="btn" data-a="income" data-id="${p.id}">+ Ajouter de l'argent</button>${visiblePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${p.id}">Transférer</button>`:''}`;
 }
 function pocketRow(p){
   const open=U.openPocket===p.id,v=balance(p.id);
@@ -1679,13 +1682,23 @@ function pocketRow(p){
   </article>`;
 }
 function vPockets(){
-  const act=activePockets(),arch=S.pockets.filter(p=>p.archived);
+  const act=activePockets().filter(p=>!p.goalOnly),arch=S.pockets.filter(p=>p.archived&&!p.goalOnly);
   const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
-  const goals=showOn('objectifs')?S.goals.slice():[];
   return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="plist">${act.map(pocketRow).join('')}</div>
-  ${goals.length?`<div class="cards-grid" style="margin-top:14px">${goals.map(g=>goalCard(g)).join('')}</div>`:''}
-  ${U.viewing?'':'<button class="btn ghost wide" data-a="addChoice">+ Ajouter</button>'}
+  ${U.viewing?'':'<button class="btn ghost wide" data-a="newPocket">+ Ajouter une poche</button>'}
   ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
+}
+/* ---------- Objectifs : rubrique indépendante des poches ---------- */
+function vGoals(){
+  const goals=S.goals.slice();
+  const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
+  const reserved=goals.reduce((s,g)=>s+Math.max(0,goalSaved(g.id)),0);
+  const avail=total-reserved;
+  const stat=(lbl,v,cls='')=>`<div class="kv"><span>${lbl}</span><b class="num ${cls}">${money(v)}</b></div>`;
+  return `${hdrMain('Objectifs')}
+  <div class="mcard" style="padding:4px 20px;margin-bottom:22px">${stat('Solde total',total)}${stat('Réservé pour tes objectifs',reserved)}${stat('Reste disponible',avail,avail<0?'neg':'')}</div>
+  ${goals.length?`<div class="stack">${goals.map(g=>goalCard(g)).join('')}</div>`:'<p class="empty">Aucun objectif pour le moment.</p>'}
+  ${U.viewing?'':'<button class="btn ghost wide" style="margin-top:14px" data-a="newGoal">+ Nouvel objectif</button>'}`;
 }
 function vPocket(){
   const id=U.pocket,p=pocketById(id);
@@ -1696,7 +1709,7 @@ function vPocket(){
   const items=allTx().filter(t=>t.p===id).slice(0,8),v=balance(id);
   const acts=p.type==='epargne'
     ?`<button class="btn" data-a="transfer" data-id="from:${id}">Transférer</button>${showOn('epargne')?`<button class="btn ghost" data-a="saveMoney" data-id="to:${id}">Mettre de côté</button>`:''}<button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`
-    :`<button class="btn" data-a="income" data-id="${id}">+ Ajouter de l'argent</button>${activePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${id}">Transférer</button>`:''}${showOn('achats')?`<button class="btn ghost" data-a="addPurchase" data-id="${id}">Achat</button>`:''}<button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`;
+    :`<button class="btn" data-a="income" data-id="${id}">+ Ajouter de l'argent</button>${visiblePockets().length>1?`<button class="btn ghost" data-a="transfer" data-id="from:${id}">Transférer</button>`:''}${showOn('achats')?`<button class="btn ghost" data-a="addPurchase" data-id="${id}">Achat</button>`:''}<button class="btn ghost" data-a="withdraw" data-id="${id}">Retirer</button>`;
   let goals='';
   if(p.type==='epargne'&&showOn('objectifs')){
     const gl=S.goals.filter(g=>goalPocket(g)===id),un=unallocated(id);
@@ -2021,7 +2034,7 @@ function openIncome(pocket,t,o={}){
 
 /* ---------- Transfert entre comptes ---------- */
 function openTransfer(arg,o={}){
-  const acc=activePockets();
+  const acc=visiblePockets();
   if(acc.length<2){toast('Crée d\u2019abord une deuxième poche pour pouvoir transférer.');openPocketForm(null,{type:'epargne'});return}
   let from=(arg&&arg.startsWith('from:'))?arg.slice(5):(mainAccount()||acc[0]).id;
   let to=(arg&&arg.startsWith('to:'))?arg.slice(3):(acc.find(p=>p.id!==from&&p.type==='epargne')||acc.find(p=>p.id!==from)).id;
@@ -2124,7 +2137,10 @@ function openSave(arg,o={}){
 function ensureSavingPocket(){
   let sp=savingPockets();
   if(sp.length)return sp[0].id;
-  const p={id:uid(),name:'Épargne',type:'epargne',ic:'sprout',show:true};
+  /* Aucune poche épargne pour l'instant : on en crée une purement technique, pour que
+     l'argent de l'objectif ait un endroit réel où exister, mais elle reste invisible :
+     pour l'utilisateur, ce n'est pas une poche, seulement un objectif. */
+  const p={id:uid(),name:'Épargne',type:'epargne',ic:'sprout',show:false,goalOnly:true};
   S.pockets.push(p);Store.core();
   return p.id;
 }
@@ -2168,7 +2184,7 @@ function openGoal(id){
   const moves=allTx().filter(t=>t.g===g.id).slice(0,15);
   const s=sheet(`<h2>${esc(g.name)}</h2><div class="sheet-amt">${fmtPct(pct)}</div>${barHTML('sheet'+g.id,pct,done)}
     <p class="t num" style="margin:10px 0 2px">${money(saved)} / ${money(g.target)}</p>${done?`<p style="margin:0 0 8px"><span class="reached">${I.check}Objectif atteint</span></p>`:`<p class="s" style="margin:0 0 8px">Reste ${money(rest)}</p>`}${tips}
-    <div class="actions"><button class="btn" data-a="saveMoney" data-id="${g.id}">Verser</button><button class="btn ghost" data-w>Retirer</button></div>
+    <div class="actions"><button class="btn" data-a="saveMoney" data-id="${g.id}">+ Ajouter de l'argent</button><button class="btn ghost" data-w>Retirer</button></div>
     ${moves.length?`<h3 class="grp">Derniers mouvements</h3><div class="list">${moves.map(t=>txRow(t)).join('')}</div>`:''}
     <div class="actions"><button class="btn ghost" data-e>Modifier</button><button class="btn quiet" data-d>Supprimer</button></div>`);
   s.querySelector('[data-w]').onclick=()=>openWithdraw(goalPocket(g),{goal:g.id});
@@ -2323,7 +2339,7 @@ function openAdjust(pocket){
   });
 }
 function openOnboarding(){
-  const ps=activePockets();
+  const ps=visiblePockets();
   const s=sheet(`${markHTML('onb-mark')}<h2>Bienvenue dans Poka</h2><p class="sub">Dis-moi comment t'appeler, puis indique le solde actuel de ta poche. Tu pourras ajouter d\u2019autres poches (épargne, vacances…) quand tu veux.</p><form novalidate>
     ${F.text('name','Ton prénom',S.settings.name||'',{ph:'Facultatif'})}
     ${ps.map(p=>F.money('p_'+p.id,pName(p.id),'')).join('')}
@@ -2419,7 +2435,7 @@ function openPocketForm(p,o={}){
   const dl=s.querySelector('[data-delete]');if(dl)dl.onclick=()=>openDeletePocket(p);
 }
 function openArchive(p){
-  const others=activePockets().filter(x=>x.id!==p.id);
+  const others=activePockets().filter(x=>x.id!==p.id&&!x.goalOnly);
   if(!others.length){toast('Garde au moins une poche active.');return}
   const v=balance(p.id),bills=S.bills.filter(b=>!b.deleted&&b.pocket===p.id),goals=S.goals.filter(g=>goalPocket(g)===p.id);
   const needDest=v!==0||bills.length||goals.length;
@@ -2509,7 +2525,7 @@ function openUrgent(){
 
 /* ---------- Suppression d'une poche : la poche disparaît, son historique reste ---------- */
 function openDeletePocket(p){
-  const others=activePockets().filter(x=>x.id!==p.id);
+  const others=activePockets().filter(x=>x.id!==p.id&&!x.goalOnly);
   if(!others.length){toast('Garde au moins une poche.');return}
   const v=balance(p.id);
   if(v<0){toast('Cette poche est sous zéro : corrige d\u2019abord son solde.');return}
@@ -2997,17 +3013,18 @@ async function resetAll(){
 }
 
 /* ---------- Navigation ---------- */
-const TABS=[['home','Accueil',I.home],['bills','Échéances',I.cal],['pockets','Poches',I.wallet],['history','Historique',I.list],['analyse','Statistiques',I.chart]];
-const TAB_SHOW={bills:'echeances',pockets:'poches',history:'historique',analyse:'stats'};
+const TABS=[['home','Accueil',I.home],['bills','Échéances',I.cal],['pockets','Poches',I.wallet],['goals','Objectifs',I.target],['history','Historique',I.list],['analyse','Statistiques',I.chart]];
+const TAB_SHOW={bills:'echeances',pockets:'poches',goals:'objectifs',history:'historique',analyse:'stats'};
 const tabOn=k=>!TAB_SHOW[k]||showOn(TAB_SHOW[k]);
 function buildNav(){
   const list=TABS.filter(([k])=>tabOn(k));
   const nav=$('#tabs nav');nav.style.gridTemplateColumns=`repeat(${list.length},minmax(0,1fr))`;
+  nav.dataset.tabcount=list.length;
   nav.innerHTML=list.map(([k,l,ic])=>`<button data-go="${k}"><span>${ic}</span>${l}</button>`).join('');
   const cur=U.view==='pocket'?'pockets':U.view;
   $$('#tabs [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===cur?'page':'false'));
 }
-const VIEWS={home:vHome,bills:vBills,pockets:vPockets,pocket:vPocket,history:vHistory,analyse:vAnalyse,settings:vSettings,notifs:vNotifs};
+const VIEWS={home:vHome,bills:vBills,pockets:vPockets,pocket:vPocket,goals:vGoals,history:vHistory,analyse:vAnalyse,settings:vSettings,notifs:vNotifs};
 function render(){
   if(!S)return;
   const main=$('#main');main.innerHTML=VIEWS[U.view]();
@@ -3063,7 +3080,7 @@ const ACT={
   addPurchase:el=>openPurchase({pocket:el.dataset.id}),
   addBill:()=>openBillForm(null),addCredit:()=>openBillForm(null,{type:'credit'}),addFuture:()=>openBillForm(null,{future:true}),
   addGoal:el=>openGoalForm(null,el.dataset.id),goal:el=>openGoal(el.dataset.id),
-  newPocket:()=>openPocketForm(null),addChoice:()=>openAddChoice(),editPocket:el=>{const p=pocketById(el.dataset.id);if(p)openPocketForm(p)},
+  newPocket:()=>openPocketForm(null),addChoice:()=>openAddChoice(),newGoal:()=>openGoalForm(null),editPocket:el=>{const p=pocketById(el.dataset.id);if(p)openPocketForm(p)},
   restorePocket:el=>{const p=pocketById(el.dataset.id);if(p){p.archived=false;Store.core();render();toast(`${pName(p.id)} est de retour.`)}},
   later:el=>{const o=occById(el.dataset.id);if(o)openLater(o)},
   accentPick:el=>{S.settings.accent=el.dataset.id;Store.core();applyTheme();render()},
