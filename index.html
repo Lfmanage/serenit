@@ -660,6 +660,32 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 /* Objectif dans la grille des poches/comptes : bordure en pointillés pour bien le différencier d'une poche */
 .cards-grid .goal{border:1.5px dashed var(--line);box-shadow:none;background:var(--surface-2)}
 
+
+/* Accueil, sur téléphone : interface fortement compactée, sans changer le design */
+@media (max-width:959px){
+  body[data-view="home"] .blk{margin-bottom:20px}
+  body[data-view="home"] .sec{margin-bottom:8px}
+  body[data-view="home"] .stack{gap:8px}
+  body[data-view="home"] .list{padding:0 14px}
+  body[data-view="home"] .op{padding:10px 0;gap:12px}
+  body[data-view="home"] .op .nm{font-size:15px}
+  body[data-view="home"] .op .s{font-size:12.5px}
+  body[data-view="home"] .acc{padding:10px 0;gap:12px}
+  body[data-view="home"] .acc .nm{font-size:14.5px}
+  body[data-view="home"] .acc .amt{font-size:17px}
+  body[data-view="home"] .due{padding:10px 12px;gap:12px}
+  body[data-view="home"] .due .nm{font-size:14.5px}
+  body[data-view="home"] .due .s{font-size:12px}
+  body[data-view="home"] .due .date{gap:0}
+  body[data-view="home"] .due .date b{font-size:16px}
+  body[data-view="home"] .due .date span{font-size:10px}
+  body[data-view="home"] .due .end .v{font-size:14.5px}
+  body[data-view="home"] .chip-st{font-size:10px;padding:3px 8px}
+  body[data-view="home"] .goal{padding:14px;gap:8px}
+  body[data-view="home"] .goal .s{font-size:12.5px}
+  body[data-view="home"] .goal .pct{font-size:14px}
+}
+
 /* Statistiques simplifiées */
 .stat-list{display:flex;flex-direction:column;gap:10px;margin:0 0 30px}
 .stat{display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);text-align:left;color:var(--ink)}
@@ -1144,14 +1170,8 @@ function addMonthsLabel(n){
   return cap(fMonth.format(parseISO(d)));
 }
 function horizonEnd(){
-  const t=today();
-  if(S.settings.horizon==='payday'){
-    const pd=Math.max(1,Math.min(31,paydayDay()));
-    const at=m=>{const s=startOfMonth(m);const last=parseISO(endOfMonth(s)).getDate();return s.slice(0,8)+pad(Math.min(pd,last))};
-    let p=at(t);if(p<=t)p=at(addMonths(startOfMonth(t),1));
-    return addDays(p,-1)<t?t:addDays(p,-1);
-  }
-  return endOfMonth(t);
+  /* Prévision toujours glissante : aujourd'hui + 3 jours, recalculée à chaque ouverture */
+  return addDays(today(),3);
 }
 function generate(untilMin){
   const t=today(),h=horizonEnd(),w=addDays(t,45);let until=h>w?h:w;if(untilMin&&untilMin>until)until=untilMin;
@@ -2230,8 +2250,7 @@ function openForecast(){
     ${kv('Échéances à venir',f.ech?'−'+money(f.ech):money(0))}${occ}
     ${kv('Épargne prévue',f.ep?'−'+money(f.ep):money(0))}${plans}
     <div class="kv sum"><span>Solde après prélèvements</span><b class="num">${money(f.dispo)}</b></div>
-    <p class="s" style="margin-top:14px">Les échéances ne sont débitées que lorsque tu les marques payées${S.settings.validation==='auto'?', ou automatiquement après le délai choisi':''}. Ton épargne n'est pas comptée ici : elle est déjà mise de côté.</p>
-    <div class="actions"><button class="btn ghost" data-go="settings:pay">Changer la période de calcul</button></div>`);
+    <p class="s" style="margin-top:14px">Les échéances ne sont débitées que lorsque tu les marques payées${S.settings.validation==='auto'?', ou automatiquement après le délai choisi':''}. Ton épargne n'est pas comptée ici : elle est déjà mise de côté.</p>`);
 }
 function openQuick(){
   sheet(`<h2>Ajouter</h2><div class="quick-grid">
