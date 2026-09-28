@@ -3367,6 +3367,11 @@ function startApp(core,tx,opts={}){
   if(!locked)afterEntry();
 }
 function afterEntry(){
+  /* Ouverture depuis une notification : « ?go=bills » amène directement sur la bonne page */
+  try{
+    const g=new URLSearchParams(location.search).get('go');
+    if(g){history.replaceState(null,'',location.pathname);if(VIEWS[g]&&g!=='pocket'&&!locked)go(g)}
+  }catch(e){}
   if('Notification' in window&&Notification.permission==='granted')syncPushSubscription();
   if(helloShown){if(!S.onboarded)openOnboarding();return}
   helloShown=true;
