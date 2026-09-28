@@ -1115,6 +1115,13 @@ body[data-view="home"] .app .blk:has(.goal2) .sec .more{font-size:12.5px}
 .grp.paid-h{color:var(--pos);font-weight:600;display:flex;align-items:center;gap:8px}
 .grp.paid-h::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
 
+
+/* Champ « Découvert autorisé » */
+.moneyin{flex:none;display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 10px;border-radius:10px;background:var(--brand-soft);color:var(--brand-ink)}
+.moneyin input{width:78px!important;flex:none!important;min-width:0;height:auto;border:0;background:transparent;text-align:right;font-size:16px;font-weight:600;color:var(--brand-ink);padding:0;margin:0;box-shadow:none;outline:0}
+.moneyin input::placeholder{color:var(--brand-ink);opacity:.5}
+.moneyin em{font-style:normal;font-weight:600}
+
 </style>
 </head>
 <body>
@@ -1126,7 +1133,7 @@ body[data-view="home"] .app .blk:has(.goal2) .sec .more{font-size:12.5px}
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-const APP_VERSION='27';
+const APP_VERSION='28';
 'use strict';
 /* ---------- Outils ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -1329,7 +1336,7 @@ const BILL_SUGGEST=[['EDF','energie'],['Loyer','loyer'],['Assurance','assur-hab'
 function defaultSettings(){
   return {name:'',theme:'auto',animations:true,validation:'manual',autoDelay:3,autoCustom:5,horizon:'month',payday:28,soonDays:3,dailyTime:'20:00',
     notif:{soon:true,unpaid:true,late:true,credit:true,daily:true,goals:true,auto:true,summary:true,income:true},privacyBlur:true,discreetStart:false,swipeTip:true,
-    accent:'indigo',bg:'blanc',totalColor:'marine',navColor:'default',upcomingDays:3,sound:'doux',soundVol:0.6,amb:{on:false},
+    accent:'indigo',bg:'blanc',totalColor:'marine',navColor:'default',upcomingDays:3,overdraft:0,sound:'doux',soundVol:0.6,amb:{on:false},
     show:Object.fromEntries(SHOW_ITEMS.map(x=>[x[0],true])),
     pinHash:null,pinSalt:null,pinLen:4,bio:null,autolock:5};
 }
@@ -1346,6 +1353,7 @@ function normalize(c){
   o.settings.show=Object.assign(defaultSettings().show,cs.show||{});
   for(const k of ['bills','occ','goals','notifs','categories','pockets','recurring'])if(!Array.isArray(o[k])||(k==='pockets'&&!o[k].length))o[k]=defaultState()[k];
   if(ACCENT_OLD[o.settings.accent])o.settings.accent=ACCENT_OLD[o.settings.accent];
+  o.settings.overdraft=Math.max(0,Math.round(+o.settings.overdraft||0));
   o.settings.upcomingDays=+o.settings.upcomingDays;if(![1,2,3,5,7,14,30].includes(o.settings.upcomingDays))o.settings.upcomingDays=3;
   if(BG_OLD[o.settings.bg])o.settings.bg=BG_OLD[o.settings.bg];
   if(TC_OLD[o.settings.totalColor])o.settings.totalColor=TC_OLD[o.settings.totalColor];
@@ -1474,8 +1482,12 @@ const Store={
 };
 
 /* ---------- Opérations ---------- */
-const NEG_MSG='Solde insuffisant : cette opération dépasse le solde disponible de cette poche.';
-function canDebit(p,amount){return balance(p)-amount>=0}
+const NEG_MSG='Solde insuffisant : cette opération dépasse le solde disponible (découvert autorisé compris) de cette poche.';
+/* Découvert autorisé : seules les poches courantes peuvent descendre sous zéro, jusqu'à la limite choisie dans Réglages. */
+function overdraftFor(id){const p=pocketById(id);if(!p||p.type==='epargne')return 0;return Math.max(0,+S.settings.overdraft||0)}
+function spendable(id){return balance(id)+overdraftFor(id)}
+function insufMsg(id,extra){const od=overdraftFor(id);return `Solde insuffisant : ${pName(id)} n\u2019a que ${money(Math.max(0,spendable(id)))}${od?' (découvert autorisé compris)':''}.${extra?' '+extra:''}`}
+function canDebit(p,amount){return balance(p)-amount>=-overdraftFor(p)}
 function addTx(t,opt={}){
   if(t.a<0&&!opt.force&&!Store.readOnly&&!canDebit(t.p,-t.a)){toast(NEG_MSG);return null}
   t.id=t.id||uid();t.ts=t.ts||Date.now();
@@ -1485,14 +1497,14 @@ function addTx(t,opt={}){
 function findTx(id){for(const m in TX){const i=TX[m].findIndex(t=>t.id===id);if(i>=0)return {m,i,t:TX[m][i]}}return null}
 function removeTx(id,opt={}){
   const f=findTx(id);if(!f)return false;
-  if(f.t.a>0&&!opt.force&&balance(f.t.p)-f.t.a<0){toast(NEG_MSG);return false}
+  if(f.t.a>0&&!opt.force&&balance(f.t.p)-f.t.a<-overdraftFor(f.t.p)){toast(NEG_MSG);return false}
   TX[f.m].splice(f.i,1);_all=null;Store.month(f.m);return true;
 }
 function updateTx(id,patch){
   const f=findTx(id);if(!f)return false;
   const t=Object.assign({},f.t,patch);
   const after=p=>balance(p)-(f.t.p===p?f.t.a:0)+(t.p===p?t.a:0);
-  if((after(f.t.p)<0&&after(f.t.p)<balance(f.t.p))||(after(t.p)<0&&after(t.p)<balance(t.p))){toast(NEG_MSG);return false}
+  if((after(f.t.p)<-overdraftFor(f.t.p)&&after(f.t.p)<balance(f.t.p))||(after(t.p)<-overdraftFor(t.p)&&after(t.p)<balance(t.p))){toast(NEG_MSG);return false}
   for(const k of Object.keys(t))if(t[k]===undefined||t[k]==='')delete t[k];
   TX[f.m].splice(f.i,1);Store.month(f.m);
   const m=monthKey(t.d);(TX[m]=TX[m]||[]).push(t);Store.month(m);_all=null;return true;
@@ -1500,7 +1512,7 @@ function updateTx(id,patch){
 function removeLinked(t){
   if(!t.link)return removeTx(t.id);
   const pair=allTx().filter(x=>x.link===t.link),pos=pair.find(x=>x.a>0);
-  if(pos&&balance(pos.p)-pos.a<0){toast(NEG_MSG);return false}
+  if(pos&&balance(pos.p)-pos.a<-overdraftFor(pos.p)){toast(NEG_MSG);return false}
   for(const x of pair)removeTx(x.id,{force:true});return true;
 }
 /* Virement interne : vérifie la poche de départ avant d'écrire les deux côtés */
@@ -1615,7 +1627,7 @@ function todoOcc(){return S.occ.filter(o=>{if(o.status!=='todo')return false;con
 function autoDelayDays(){const st=S.settings;return st.autoDelay==='custom'?Math.max(1,st.autoCustom|0||1):(+st.autoDelay||1)}
 function payOcc(o,{auto=false}={}){
   const b=billById(o.billId);if(!b||o.status!=='todo')return false;
-  if(!canDebit(b.pocket,o.amount)){if(!auto)toast(`Solde insuffisant sur ${pName(b.pocket)} : ${money(balance(b.pocket))} disponibles pour ${money(o.amount)} à payer.`);return false}
+  if(!canDebit(b.pocket,o.amount)){if(!auto)toast(`Solde insuffisant sur ${pName(b.pocket)} : ${money(Math.max(0,spendable(b.pocket)))} disponibles pour ${money(o.amount)} à payer.`);return false}
   const t=today();const d=auto?(o.due<=t?o.due:t):t;
   const tx=addTx({d,a:-o.amount,p:b.pocket,k:'paiement',c:b.cat,l:b.name,o:o.id});if(!tx)return false;
   o.wasLater=!!o.later;o.status='paid';o.paidAt=d;o.txId=tx.id;o.auto=auto;o.later=false;Store.core();
@@ -2132,7 +2144,7 @@ function pocketActions(p){
 function pocketRow(p){
   const open=U.openPocket===p.id,v=balance(p.id);
   return `<article class="xc pocket-row${open?' open':''}" data-pocket-card="${p.id}" style="view-transition-name:pk-${p.id}">
-    <button class="xhead" data-a="togglePocket" data-id="${p.id}" aria-expanded="${open}">${tileHTML(pIcon(p.id),'sm')}<span class="nm"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':'Poche courante'}</span></span><span class="v ${balCls(v)}">${countHTML('bal:'+p.id,v)}</span><span class="chev">${I.chev}</span></button>
+    <button class="xhead" data-a="togglePocket" data-id="${p.id}" aria-expanded="${open}">${tileHTML(pIcon(p.id),'sm')}<span class="nm"><span class="pname">${esc(pName(p.id))}</span><span class="s">${p.type==='epargne'?'Épargne':(v<0?'À découvert':'Poche courante')}</span></span><span class="v ${balCls(v)}">${countHTML('bal:'+p.id,v)}</span><span class="chev">${I.chev}</span></button>
     <div class="xmore"><div class="xin pocket-open">
       ${countHTML('bal:'+p.id,v,'amt-xl '+balCls(v))}
       ${U.viewing?'':`<div class="btns">${pocketActions(p)}</div>`}
@@ -2455,8 +2467,8 @@ function openPurchase(o={}){
     const b0=t?null:dailyBudget();
     const d=readForm(f),a=parseMoney(d.amount);
     let ok=setErr(f,'amount',a>0?'':'Indique un montant.')&setErr(f,'label',d.label?'':'Indique le motif de cet achat.');
-    const availP=balance(d.pocket)+(t&&t.p===d.pocket?-t.a:0);
-    if(ok&&a>availP)ok=setErr(f,'amount',`Solde insuffisant : ${pName(d.pocket)} n\u2019a que ${money(Math.max(0,availP))}. Cette opération dépasse le solde disponible de cette poche.`);
+    const availP=spendable(d.pocket)+(t&&t.p===d.pocket?-t.a:0);
+    if(ok&&a>availP)ok=setErr(f,'amount',`Solde insuffisant : ${pName(d.pocket)} n\u2019a que ${money(Math.max(0,availP))}${overdraftFor(d.pocket)?' (découvert autorisé compris)':''}. Cette opération dépasse le solde disponible de cette poche.`);
     if(!ok)return;
     const data={d:d.date||today(),a:-a,p:d.pocket,c:d.cat,l:d.label,w:d.where};
     if(!(t?updateTx(t.id,data):addTx(Object.assign({k:'achat'},data))))return;
@@ -2530,7 +2542,7 @@ function openTransfer(arg,o={}){
     e.preventDefault();const d=readForm(f),a=parseMoney(d.amount);
     let ok=setErr(f,'amount',a>0?'':'Indique un montant.');
     if(ok&&d.from===d.to)ok=setErr(f,'form','Choisis deux poches différentes.');
-    if(ok&&!canDebit(d.from,a))ok=setErr(f,'amount',`Solde insuffisant : ${pName(d.from)} n\u2019a que ${money(Math.max(0,balance(d.from)))}.`);
+    if(ok&&!canDebit(d.from,a))ok=setErr(f,'amount',insufMsg(d.from));
     if(!ok)return;
     const date=d.date||today(),g=d.goal?goalById(d.goal):null;
     const lf=d.label||`Virement vers ${pName(d.to)}`,lt=d.label||`Virement depuis ${pName(d.from)}`;
@@ -2555,7 +2567,7 @@ function openWithdraw(pocket,o={}){
   f.addEventListener('submit',e=>{
     e.preventDefault();const d=readForm(f),a=parseMoney(d.amount);
     let ok=setErr(f,'amount',a>0?'':'Indique un montant.')&setErr(f,'label',d.label?'':'Le motif est obligatoire pour un retrait.');
-    if(ok&&!canDebit(pocket,a))ok=setErr(f,'amount',`Solde insuffisant : ${pName(pocket)} n\u2019a que ${money(Math.max(0,balance(pocket)))}. Cette opération dépasse le solde disponible de cette poche.`);
+    if(ok&&!canDebit(pocket,a))ok=setErr(f,'amount',insufMsg(pocket,'Cette opération dépasse le solde disponible de cette poche.'));
     if(ok&&isE){
       const avail=d.goal?Math.max(0,goalSaved(d.goal)):(goals.length?unallocated(pocket):balance(pocket));
       if(a>avail)ok=setErr(f,'amount',d.goal?`Cet objectif contient ${money(avail)}.`:`Il y a ${money(avail)} d'épargne non affectée. Choisis un objectif.`);
@@ -2597,7 +2609,7 @@ function openSave(arg,o={}){
       else if(goalPocket(g)!==from)ok=setErr(f,'amount','Choisis un objectif de cette même poche.');
       else if(a>unFor(from))ok=setErr(f,'amount',`Il y a ${money(unFor(from))} non affectés.`);
     }
-    if(ok&&from&&!canDebit(from,a))ok=setErr(f,'amount',`Solde insuffisant : ${pName(from)} n\u2019a que ${money(Math.max(0,balance(from)))}.`);
+    if(ok&&from&&!canDebit(from,a))ok=setErr(f,'amount',insufMsg(from));
     if(!ok)return;
     const date=d.date||today(),label=g?`Épargne : ${g.name}`:'Mise de côté';
     if(!addTransfer(from,dest,a,date,label,label,{toG:g?g.id:undefined}))return;
@@ -2803,8 +2815,8 @@ function openAdjust(pocket){
   const s=sheet(`<h2>Corriger le solde</h2><p class="sub">${esc(pName(pocket))} affiche ${money(balance(pocket))}. Indique le solde réel, l'écart sera enregistré comme ajustement.</p><form novalidate>${F.money('amount','Solde réel','',{big:true,auto:true})}<button class="btn block" type="submit">Corriger</button></form>`);
   const f=s.querySelector('form');
   f.addEventListener('submit',e=>{
-    e.preventDefault();const v=parseMoney(f.amount.value);
-    if(!setErr(f,'amount',isNaN(v)?'Indique un montant, 0 ou plus : une poche ne descend jamais sous zéro.':''))return;
+    e.preventDefault();const od=overdraftFor(pocket),v=parseMoney(f.amount.value,od>0);
+    if(!setErr(f,'amount',isNaN(v)?(od>0?'Indique un montant (tu peux mettre un signe moins).':'Indique un montant, 0 ou plus : une poche ne descend jamais sous zéro.'):v<-od?`Le solde ne peut pas descendre sous −${money(od)} (ton découvert autorisé).`:''))return;
     const diff=v-balance(pocket);
     if(diff)addTx({d:today(),a:diff,p:pocket,k:'ouverture',l:'Ajustement du solde'},{force:true});
     closeSheet();render();toast('Solde corrigé.');
@@ -2834,7 +2846,7 @@ function openOnboarding(){
 /* ---------- Paiement avec transition À PAYER → PAYÉ ---------- */
 function payWithGrace(o){
   const b=billById(o.billId);if(!b||o.status!=='todo')return;
-  if(!canDebit(b.pocket,o.amount)){toast(`Solde insuffisant sur ${pName(b.pocket)} : ${money(Math.max(0,balance(b.pocket)))} disponibles pour ${money(o.amount)}. Rien n\u2019a été débité.`);return}
+  if(!canDebit(b.pocket,o.amount)){toast(`Solde insuffisant sur ${pName(b.pocket)} : ${money(Math.max(0,spendable(b.pocket)))} disponibles pour ${money(o.amount)}. Rien n\u2019a été débité.`);return}
   const card=document.querySelector(`[data-card="${o.id}"]`);
   const undo={label:'Annuler',fn:()=>{unpayOcc(o);render()}};
   if(card&&animOn()){
@@ -3189,6 +3201,7 @@ function vSettings(){
     body=`${grp(row('Validation des échéances',vsel('validation',[['manual','Manuelle'],['auto','Automatique']],st.validation,'Validation'),'','check'),'big')}
     ${auto?grp(row('Délai avant validation',vsel('autoDelay',[[1,'1 jour'],[2,'2 jours'],[3,'3 jours'],[7,'7 jours'],['custom','Personnalisé']],st.autoDelay,'Délai'),'Tu es prévenu la veille','clock'),'big'):''}
     ${auto&&st.autoDelay==='custom'?grp(row('Nombre de jours',`<input type="number" min="1" max="60" data-set="autoCustom" value="${st.autoCustom}" aria-label="Nombre de jours">`,'','clock'),'big'):''}
+    ${grp(row('Découvert autorisé',`<span class="moneyin"><input type="text" inputmode="decimal" data-overdraft value="${st.overdraft?String(st.overdraft/100).replace('.',','):''}" placeholder="0" aria-label="Découvert autorisé en euros"><em>€</em></span>`,st.overdraft?`Jusqu\u2019à −${money(st.overdraft)} sur tes poches courantes`:'0 € : aucune poche ne passe sous zéro','card'),'big')}
     ${grp(row('Solde après prélèvements',sw('show.dispo',showOn('dispo'),'Solde après prélèvements'),'','chart'),'big')}
     ${grp(row('Prévision',`<span class="vpill static"><span>3 jours</span></span>`,'Toujours aujourd\u2019hui + 3 jours, automatiquement','cal'),'big')}`;
   }else if(c==='show'){
@@ -3689,6 +3702,12 @@ document.addEventListener('change',e=>{
     else if(p==='autoDelay')v=v==='custom'?'custom':+v;
     if(p==='autoCustom'&&v<1)v=1;
     setPath(p,v);Store.core();applySetting(p);if(el.type!=='range')render();
+  }
+  if(el.matches('[data-overdraft]')){
+    const raw=el.value.trim(),c=raw===''?0:parseMoney(raw);
+    if(isNaN(c)||c<0){toast('Indique un montant en euros, par exemple 500 ou 250,50.');render();return}
+    S.settings.overdraft=c;Store.core();render();
+    toast(c?`Découvert autorisé : ${money(c)}.`:'Découvert désactivé : plus aucune poche ne peut passer sous zéro.');
   }
   if(el.matches('[data-an]')){if(el.value){U.anCustom[el.dataset.an]=el.value;render()}}
   if(el.matches('[data-cmp]')){if(el.value){U['cmp'+el.dataset.cmp.toUpperCase()]=el.value;render()}}
