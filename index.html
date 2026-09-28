@@ -975,7 +975,7 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
    ===================================================================== */
 @media (max-width:520px){
   /* --- commun aux 5 pages : en-tête, boutons ronds, bouton flottant --- */
-  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top{padding:11px 0 7px;gap:8px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top{padding-top:11px;padding-bottom:7px;gap:8px}
   body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top h1{font-size:27px}
   body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top .round{width:38px;height:38px}
   body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top .round svg{width:20px;height:20px}
@@ -1126,6 +1126,7 @@ body[data-view="home"] .app .blk:has(.goal2) .sec .more{font-size:12.5px}
 <script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+const APP_VERSION='27';
 'use strict';
 /* ---------- Outils ---------- */
 const $=(s,r=document)=>r.querySelector(s);
@@ -3166,7 +3167,8 @@ function vSettings(){
     ${grp(nav('notif',`Rappels ${st.soonDays} j avant, ${fxName.toLowerCase()}, question à ${st.dailyTime.replace(/^0/,'').replace(':00',' h').replace(':',' h ')}`)+nav('pay',st.validation==='auto'?`Validation automatique après ${autoDelayDays()} jour${autoDelayDays()>1?'s':''}`:'Validation manuelle'))}
     ${grp(nav('sec',hasPin?`Code PIN${st.bio?', Face ID':''}, verrouillage ${+st.autolock?`après ${st.autolock} min`:'à l’ouverture'}`:'Aucun code pour l’instant')+nav('share',Store.mode==='supabase'?'Autoriser une personne à consulter tes poches':'Disponible dans la version en ligne'))}
     ${grp(nav('look',`${{auto:'Automatique',light:'Clair',dark:'Sombre'}[st.theme]}, ${(ACCENTS.find(a=>a[0]===st.accent)||ACCENTS[0])[1].toLowerCase()}, fond ${(BGS.find(b=>b[0]===st.bg)||BGS[0])[1].toLowerCase()}`)+nav('data','Export, sauvegarde, catégories'))}
-    <p class="s" style="margin:6px 4px 0">${Store.mode==='supabase'?'Tes données sont enregistrées dans ton compte Poka, séparées de celles des autres utilisateurs.':Store.mode==='db'?'Tes données sont enregistrées dans ton compte et restent privées.':'Tes données sont enregistrées sur cet appareil.'}</p>`;
+    <p class="s" style="margin:6px 4px 0">${Store.mode==='supabase'?'Tes données sont enregistrées dans ton compte Poka, séparées de celles des autres utilisateurs.':Store.mode==='db'?'Tes données sont enregistrées dans ton compte et restent privées.':'Tes données sont enregistrées sur cet appareil.'}</p>
+    <p class="s" style="margin:14px 4px 0;text-align:center;opacity:.7">Poka · version ${APP_VERSION}</p>`;
   }
   let body='';
   if(c==='notif'){
@@ -3803,7 +3805,12 @@ function authMsg(error){
   return 'Une erreur est survenue. Réessaie dans un instant.';
 }
 async function initOnline(){
-  if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if('serviceWorker' in navigator&&location.protocol==='https:'){
+    const hadController=!!navigator.serviceWorker.controller;
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update().catch(()=>{})).catch(()=>{});
+    let reloaded=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!hadController||reloaded)return;reloaded=true;location.reload()});
+  }
   if(/type=recovery/.test(location.hash+location.search))recovering=true;
   SB=window.supabase.createClient(CFG.supabaseUrl,CFG.supabaseKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
   Store.sb=SB;Store.mode='supabase';
