@@ -967,6 +967,131 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 /* Animations désactivées */
 .no-anim *,.no-anim *::before,.no-anim *::after{animation:none!important;transition:none!important}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+
+/* =====================================================================
+   COMPACTAGE TÉLÉPHONE — une page à la fois, mêmes contenus, même design.
+   On réduit (hauteurs, espaces, tailles), on ne réorganise rien.
+   Limité aux écrans de téléphone ; les fenêtres (sheets) ne sont pas touchées.
+   ===================================================================== */
+@media (max-width:520px){
+  /* --- commun aux 5 pages : en-tête, boutons ronds, bouton flottant --- */
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top{padding:11px 0 7px;gap:8px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top h1{font-size:27px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top .round{width:38px;height:38px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .top .round svg{width:20px;height:20px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .app .avatar.sm{width:34px;height:34px;font-size:14px}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .fab{width:38px;height:38px;bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+  body:is([data-view="home"],[data-view="bills"],[data-view="pockets"],[data-view="history"],[data-view="analyse"]) .fab svg{width:19px;height:19px}
+  .tabs nav{height:calc(50px + env(safe-area-inset-bottom,0px))}
+  .tabs button{min-height:44px}
+  .tabs button svg{width:19px;height:19px}
+
+  /* --- 1. ACCUEIL --- */
+  body[data-view="home"] .app .hero.v2{margin:0 0 8px}
+  body[data-view="home"] .app .blk{margin-bottom:11px}
+  body[data-view="home"] .app .sec{margin-bottom:5px}
+  body[data-view="home"] .app .sec h2{font-size:18px}
+  body[data-view="home"] .app .tile.sm{width:34px;height:34px;border-radius:11px}
+  body[data-view="home"] .app .tile.sm svg{width:18px;height:18px}
+  body[data-view="home"] .app .op{padding:7px 0}
+  body[data-view="home"] .app .op .nm{font-size:14px}
+  body[data-view="home"] .app .op .amt{font-size:14.5px}
+  body[data-view="home"] .app .goal2{padding:10px 12px;gap:11px;border-radius:18px}
+  body[data-view="home"] .app .goal2 .tile.lg{width:42px;height:42px;border-radius:13px}
+  body[data-view="home"] .app .goal2 .tile.lg svg{width:21px;height:21px}
+  body[data-view="home"] .app .goal2 .nm{font-size:14.5px}
+  body[data-view="home"] .app .goal2 .pill{padding:5px 10px;font-size:12.5px}
+  body[data-view="home"] .app .urgent-banner{padding:11px 14px;border-radius:18px;gap:11px}
+  body[data-view="home"] .app .inc-card{padding:12px 14px;gap:10px;border-radius:18px}
+
+  /* --- 2. ÉCHÉANCES --- */
+  body[data-view="bills"] .app .mnav{margin:0 0 7px}
+  body[data-view="bills"] .app .period .round{width:36px;height:36px}
+  body[data-view="bills"] .app .period .round svg{width:19px;height:19px}
+  body[data-view="bills"] .app .period .l{font-size:20px}
+  body[data-view="bills"] .app .hint{font-size:12.5px;line-height:1.35}
+  body[data-view="bills"] .app .grp{margin:11px 2px 5px;font-size:12.5px}
+  body[data-view="bills"] .app .stack{gap:7px}
+  body[data-view="bills"] .app .xc{border-radius:18px}
+  body[data-view="bills"] .app .xhead{min-height:48px;padding:8px 13px;gap:10px}
+  body[data-view="bills"] .app .xhead .nm{font-size:15px}
+  body[data-view="bills"] .app .xhead .v{font-size:17px}
+  body[data-view="bills"] .app .xpct{font-size:12px;padding:2px 8px}
+  body[data-view="bills"] .app .xin .kv{font-size:13.5px;padding:7px 0}
+  body[data-view="bills"] .app .xacts .btn{min-height:42px}
+  body[data-view="bills"] .app .chip-st{font-size:10px;padding:3px 8px}
+  body[data-view="bills"] .app .btn{min-height:44px}
+  body[data-view="bills"] .app .chips{margin-bottom:0}
+  body[data-view="bills"] .app .chip{min-height:34px;padding:0 13px;font-size:13.5px}
+  body[data-view="bills"] .app .empty-box{padding:16px 16px;gap:10px;border-radius:18px}
+  body[data-view="bills"] .app .empty-box p{font-size:15px}
+
+  /* --- 3. MES COMPTES (liste + détail d'une poche) --- */
+  body[data-view="pockets"] .app .plist{gap:7px;margin-bottom:9px}
+  body[data-view="pockets"] .app .xc{border-radius:18px}
+  body[data-view="pockets"] .app .xhead{min-height:48px;padding:8px 13px;gap:10px}
+  body[data-view="pockets"] .app .tile.sm{width:34px;height:34px;border-radius:11px}
+  body[data-view="pockets"] .app .tile.sm svg{width:18px;height:18px}
+  body[data-view="pockets"] .app .pocket-row .xhead .v{font-size:16px}
+  body[data-view="pockets"] .app .pocket-row .xhead .nm .s{font-size:11.5px}
+  body[data-view="pockets"] .app .pocket-open{gap:10px}
+  body[data-view="pockets"] .app .pocket-open .amt-xl{font-size:30px}
+  body[data-view="pockets"] .app .btn{min-height:42px;font-size:15px}
+  body[data-view="pockets"] .app .btn.wide{min-height:44px}
+  body[data-view="pockets"] .app .op{padding:9px 0}
+  body[data-view="pockets"] .app .op .nm{font-size:15px}
+  body[data-view="pockets"] .app .list{border-radius:20px}
+  body[data-view="pockets"] .app .sec{margin-bottom:6px}
+  body[data-view="pockets"] .app .sec h2{font-size:19px}
+  body[data-view="pockets"] .app .blk{margin-bottom:16px}
+  body[data-view="pockets"] .app .pdetail{padding:10px 22px 16px;margin-bottom:14px;gap:9px;border-radius:0 0 28px 28px}
+  body[data-view="pockets"] .app .pdetail .bal{font-size:clamp(34px,10.4vw,42px)}
+  body[data-view="pockets"] .app .pdetail .name{font-size:14.5px;margin-top:2px}
+  body[data-view="pockets"] .app .duo{gap:8px;margin-bottom:14px}
+  body[data-view="pockets"] .app .duo>div{padding:11px 14px;border-radius:16px}
+  body[data-view="pockets"] .app .grp{margin:12px 2px 6px}
+
+  /* --- 4. HISTORIQUE --- */
+  body[data-view="history"] .app .search{margin:0 0 7px}
+  body[data-view="history"] .app .search input{height:44px;border-radius:15px;padding-left:44px}
+  body[data-view="history"] .app .search svg{left:14px;top:11px;width:21px;height:21px}
+  body[data-view="history"] .app .chips{gap:6px;margin-bottom:0;padding:0 22px 5px}
+  body[data-view="history"] .app .chip{min-height:34px;padding:0 13px;font-size:13.5px}
+  body[data-view="history"] .app .grp{margin:9px 2px 5px;font-size:12.5px}
+  body[data-view="history"] .app .list{border-radius:20px;padding:0 14px}
+  body[data-view="history"] .app .op{padding:8px 0;gap:11px}
+  body[data-view="history"] .app .op .nm{font-size:15px}
+  body[data-view="history"] .app .op .s{font-size:12.5px}
+  body[data-view="history"] .app .op .amt{font-size:15px}
+  body[data-view="history"] .app .tile.sm{width:34px;height:34px;border-radius:11px}
+  body[data-view="history"] .app .tile.sm svg{width:18px;height:18px}
+  body[data-view="history"] .app .btn{min-height:42px}
+
+  /* --- 5. STATS --- */
+  body[data-view="analyse"] .app .seg{margin:0 0 9px;padding:3px;border-radius:15px}
+  body[data-view="analyse"] .app .seg button{min-height:36px;font-size:13.5px}
+  body[data-view="analyse"] .app .period{margin:-2px 0 8px}
+  body[data-view="analyse"] .app .period .round{width:36px;height:36px}
+  body[data-view="analyse"] .app .period .round svg{width:19px;height:19px}
+  body[data-view="analyse"] .app .period .l{font-size:20px}
+  body[data-view="analyse"] .app .stat-list{gap:7px;margin-bottom:16px}
+  body[data-view="analyse"] .app .stat{padding:10px 14px;border-radius:18px;gap:12px}
+  body[data-view="analyse"] .app .stat .lbl{font-size:11px}
+  body[data-view="analyse"] .app .stat .v{font-size:25px}
+  body[data-view="analyse"] .app .tile.sm{width:34px;height:34px;border-radius:11px}
+  body[data-view="analyse"] .app .tile.sm svg{width:18px;height:18px}
+  body[data-view="analyse"] .app .sec{margin-bottom:6px}
+  body[data-view="analyse"] .app .sec h2{font-size:19px}
+  body[data-view="analyse"] .app .blk{margin-bottom:14px}
+  body[data-view="analyse"] .app .mcard,body[data-view="analyse"] .app .cmp-card{border-radius:22px;margin-bottom:10px}
+  body[data-view="analyse"] .app .cmp-card{padding:2px 16px}
+  body[data-view="analyse"] .app .cmp-card .cmp{min-height:46px;font-size:15px}
+  body[data-view="analyse"] .app .evo.mid{font-size:21px}
+  body[data-view="analyse"] .app .list{border-radius:20px}
+  body[data-view="analyse"] .app .op{padding:9px 0}
+  body[data-view="analyse"] .app .op .nm{font-size:15px}
+}
+
 </style>
 </head>
 <body>
