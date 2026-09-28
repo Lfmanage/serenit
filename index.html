@@ -1092,6 +1092,29 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
   body[data-view="analyse"] .app .op .nm{font-size:15px}
 }
 
+
+/* Accueil : l'objectif d'épargne est discret (ce n'est pas l'information principale) */
+body[data-view="home"] .app .goal2{padding:6px 10px;gap:8px;border-radius:14px;align-items:center}
+body[data-view="home"] .app .goal2 .tile.lg{width:28px;height:28px;border-radius:9px}
+body[data-view="home"] .app .goal2 .tile.lg svg{width:15px;height:15px}
+body[data-view="home"] .app .goal2 .gmid{display:flex;flex-direction:row;flex-wrap:wrap;column-gap:8px;row-gap:3px;align-items:baseline}
+body[data-view="home"] .app .goal2 .nm{flex:0 0 auto;max-width:100%;font-size:12px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+body[data-view="home"] .app .goal2 .amts{flex:0 0 auto;font-size:10.5px;white-space:nowrap}
+body[data-view="home"] .app .goal2 .bar{flex:1 0 100%;height:4px;margin:0}
+body[data-view="home"] .app .goal2 .reached{flex:1 0 100%;font-size:11px}
+body[data-view="home"] .app .goal2 .pill{align-self:center;padding:3px 8px;font-size:11px}
+body[data-view="home"] .app .blk:has(.goal2) .sec{margin-bottom:4px}
+body[data-view="home"] .app .blk:has(.goal2) .sec h2{font-size:16px}
+body[data-view="home"] .app .blk:has(.goal2) .sec .more{font-size:12.5px}
+
+
+/* Échéance payée : tout en vert (titre « Payées » + carte) */
+.xc.paid{background:color-mix(in srgb,var(--ok) 15%,var(--surface));box-shadow:inset 0 0 0 1.5px color-mix(in srgb,var(--ok) 40%,transparent),var(--shadow)}
+.xc.paid .xhead .nm{color:var(--pos)}
+.xc.paid .xhead .v{color:var(--pos)}
+.grp.paid-h{color:var(--pos);font-weight:600;display:flex;align-items:center;gap:8px}
+.grp.paid-h::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ok)}
+
 </style>
 </head>
 <body>
@@ -2096,7 +2119,7 @@ function vBills(){
   return `${hdrMain('Échéances',leftTotal?`${money(leftTotal)} à régler ${isCur?'ce mois-ci':'en '+monthName(from)}`:'')}
   <div class="period mnav"><button class="round" data-a="billMonth" data-id="-1" aria-label="Mois précédent"${m<=bd.min?' disabled':''}>${I.back}</button><p class="l">${esc(cap(fMonth.format(parseISO(from))))}</p><button class="round" data-a="billMonth" data-id="1" aria-label="Mois suivant"${m>=bd.max?' disabled':''}>${I.chev}</button></div>
   ${tip}
-  ${any?sec('URGENT',urg.map(dueCard),'urgent-h')+sec('À payer',todo.map(dueCard))+sec('En pause',[...paused.map(dueCard),...pausedBills.map(billCard)])+sec('Payées',paid.map(dueCard)):`<div class="empty-box"><p>Aucune échéance prévue ce mois-ci.</p>${U.viewing?'':'<button class="btn soft" data-a="addBill">+ Ajouter une échéance</button>'}</div>`}
+  ${any?sec('URGENT',urg.map(dueCard),'urgent-h')+sec('À payer',todo.map(dueCard))+sec('En pause',[...paused.map(dueCard),...pausedBills.map(billCard)])+sec('Payées',paid.map(dueCard),'paid-h'):`<div class="empty-box"><p>Aucune échéance prévue ce mois-ci.</p>${U.viewing?'':'<button class="btn soft" data-a="addBill">+ Ajouter une échéance</button>'}</div>`}
   ${any&&!U.viewing?'<div style="margin-top:18px"><button class="btn ghost wide" data-a="addBill">+ Ajouter une échéance</button></div>':''}
   ${links.length?`<div class="chips" style="margin-top:18px">${links.join('')}</div>`:''}`;
 }
