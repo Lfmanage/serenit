@@ -4,5 +4,6 @@
 // La clé à coller est la clé PUBLIQUE (« publishable » ou « anon public »), jamais la clé secrète.
 window.SERENITE_CONFIG = {
   supabaseUrl: 'https://dlrivczpvzrelbmwsfyp.supabase.co',
-  supabaseKey: 'sb_publishable_stNXSw8HY81-vrlqoNp9vA_baTklUAs'
+  supabaseKey: 'sb_publishable_stNXSw8HY81-vrlqoNp9vA_baTklUAs',
+  vapidPublicKey:'BMIcapvlLlfTH89Dhn8nSZN-2kt6B0QuFT3iiaLOZ8hfLWyLOjy1IugNP97BCZefNAJoXgxX2LzbmrvJ5J_MATI'
 };
