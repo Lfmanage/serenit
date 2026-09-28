@@ -1893,7 +1893,7 @@ function pocketRow(p){
 function vPockets(){
   const act=activePockets().filter(p=>!p.goalOnly),arch=S.pockets.filter(p=>p.archived&&!p.goalOnly);
   const total=activePockets().reduce((s,p)=>s+balance(p.id),0);
-  return `${hdrMain('Mes comptes',`Solde total : ${money(total)}`)}<div class="plist">${act.map(pocketRow).join('')}</div>
+  return `${hdrMain('Mes poches',`Solde total : ${money(total)}`)}<div class="plist">${act.map(pocketRow).join('')}</div>
   ${U.viewing?'':'<button class="btn ghost wide" data-a="newPocket">+ Ajouter une poche</button>'}
   ${arch.length&&!U.viewing?`<h3 class="grp" style="margin-top:26px">Poches archivées</h3><div class="list archived">${arch.map(p=>`<div class="op">${tileHTML(pIcon(p.id),'sm neutral')}<span class="mid"><span class="nm pname">${esc(pName(p.id))}</span><span class="s">Historique conservé</span></span><button class="mini" data-a="restorePocket" data-id="${p.id}">Restaurer</button></div>`).join('')}</div>`:''}`;
 }
@@ -2803,7 +2803,7 @@ function vSettings(){
     <h3 class="grp caps">Résumés</h3>${grp(nrow('chart','Résumés semaine et mois','notif.summary'),'cmp')}
     <h3 class="grp caps">Revenus automatiques</h3>${grp(nrow('swap','Ajout automatique des revenus','notif.income'),'cmp')}
     <h3 class="grp caps">Horaires</h3>${grp(row('Prévenir avant une échéance',vsel('soonDays',[[1,'1 jour'],[2,'2 jours'],[3,'3 jours'],[5,'5 jours'],[7,'7 jours']],st.soonDays,'Délai de prévenance'),'','clock','red')+row('Heure de la question du jour',vtime('dailyTime',st.dailyTime,'Heure de la question quotidienne'),'','clock','red'),'cmp')}
-    <h3 class="grp caps">Notifications du téléphone</h3>${grp(row('Notifications système',`<button class="sw" role="switch" aria-checked="${perm==='granted'}" aria-label="Notifications système" data-a="perm"></button>`,perm==='granted'?'':permTxt,'bell'),'cmp')}
+    <h3 class="grp caps">Notifications du téléphone</h3>${grp(row('Notifications système',`<button class="sw" role="switch" aria-checked="${perm==='granted'}" aria-label="Notifications système" data-a="perm"></button>`,perm==='granted'?'':permTxt,'bell')+(Store.mode==='supabase'?row('Envoyer un test',pbtn('Tester','data-a="pushTest"'),'Vérifie que ton téléphone reçoit bien les notifications','bell'):''),'cmp')}
     <h3 class="grp caps">Sons</h3>${grp(row('Son des notifications',vsel('sound',FX_SOUNDS,st.sound,'Son des notifications'),'','speaker')+row('Volume',`<input type="range" min="0" max="100" data-set="soundVol" value="${Math.round(st.soundVol*100)}" aria-label="Volume des notifications"><span class="volv">${Math.round(st.soundVol*100)}%</span>`,'','speaker')+row('Essayer le son',pbtn(`${I.play}<span>Écouter</span>`,'data-a="preview"'),'','play'),'cmp')}`;
   }else if(c==='pay'){
     const auto=st.validation==='auto';
@@ -2854,6 +2854,7 @@ function vSettings(){
     ${grp(row('Relevé PDF',pbtn('Générer','data-a="pdf"'),'Générez un relevé de vos opérations.','doc'),'big')}
     ${grp(row('Sauvegarde complète',pbtn('Sauvegarder','data-a="backup"'),'Sauvegardez toutes vos données.','cloud'),'big')}
     ${grp(row('Restaurer une sauvegarde',pbtn('Restaurer','data-a="restore"'),'Restaurez vos données.','download'),'big')}
+    ${Store.mode==='supabase'?grp(brow('refresh','Sauvegardes automatiques','Une copie chaque nuit, gardée 30 jours.','data-a="cloudBackups"'),'big'):''}
     ${grp(brow('tag','Catégories et sous-catégories','Gérez vos catégories.','data-a="cats"'),'big')}
     ${grp(row('Tout effacer',pbtn('Tout effacer','data-a="reset"','danger'),'Supprimez toutes les données.','trash','red'),'big')}`;
   }
@@ -3036,21 +3037,38 @@ function urlB64ToUint8Array(b64){
 /* Enregistre (ou met à jour) l'abonnement Web Push de cet appareil dans Supabase,
    pour que la « Question du jour » et les rappels puissent arriver même appli fermée. */
 async function syncPushSubscription(){
-  if(Store.mode!=='supabase'||!SB||!ACCOUNT||!CFG.vapidPublicKey||!('serviceWorker' in navigator)||!('PushManager' in window))return;
+  if(Store.mode!=='supabase'||!SB||!ACCOUNT)return {ok:false,error:'Les notifications demandent la version en ligne avec un compte Poka.'};
+  if(!CFG.vapidPublicKey)return {ok:false,error:'La clé des notifications manque dans config.js (ligne vapidPublicKey).'};
+  if(!('serviceWorker' in navigator)||!('PushManager' in window))return {ok:false,error:'Ce navigateur ne gère pas les notifications. Sur iPhone, installe d\u2019abord Poka sur l\u2019écran d\u2019accueil.'};
   try{
-    const reg=await navigator.serviceWorker.ready;
+    const reg=await Promise.race([navigator.serviceWorker.ready,new Promise((_,no)=>setTimeout(()=>no(new Error('sw-inactif')),6000))]);
     let sub=await reg.pushManager.getSubscription();
     if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:urlB64ToUint8Array(CFG.vapidPublicKey)});
     const j=sub.toJSON(),tz=Intl.DateTimeFormat().resolvedOptions().timeZone||'Europe/Paris';
-    await SB.from('serenite_push_subs').upsert({user_id:ACCOUNT.id,endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,tz,daily_time:S.settings.dailyTime||'20:00',updated_at:new Date().toISOString()});
-  }catch(e){console.warn('push',e)}
+    const r=await SB.from('serenite_push_subs').upsert({user_id:ACCOUNT.id,endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth,tz,daily_time:S.settings.dailyTime||'20:00',updated_at:new Date().toISOString()});
+    if(r.error)return {ok:false,error:'Enregistrement impossible : lance le fichier 3-supabase-push.sql dans Supabase. ('+r.error.message+')'};
+    return {ok:true};
+  }catch(e){console.warn('push',e);return {ok:false,error:e&&e.message==='sw-inactif'?'Poka n\u2019est pas prête pour les notifications : ferme-la complètement puis rouvre-la, en vérifiant qu\u2019elle est installée sur l\u2019écran d\u2019accueil.':'Abonnement impossible : '+(e&&e.message||e)}}
+}
+async function pushTest(){
+  if(!('Notification' in window)||Notification.permission!=='granted'){toast('Touche d\u2019abord « Autoriser » pour activer les notifications du téléphone.');return}
+  toast('Test en cours…');
+  const s=await syncPushSubscription();
+  if(!s.ok){toast(s.error);return}
+  try{
+    const {data,error}=await SB.functions.invoke('send-daily-question',{body:{test:true}});
+    if(error){let m=error.message||'erreur';try{const j=await error.context.json();m=j.error||m}catch(e){}
+      toast(/not found|404/i.test(m)?'La fonction « send-daily-question » n\u2019est pas déployée dans Supabase.':'Échec du test : '+m);return}
+    if(data&&data.sent>0)toast('Test envoyé : la notification arrive dans quelques secondes.');
+    else toast('Test non envoyé : '+((data&&data.detail)||'aucun appareil enregistré')+'.');
+  }catch(e){toast('Échec du test : '+(e&&e.message||e))}
 }
 async function askNotifPerm(){
   if(!('Notification' in window)){toast('Les notifications du téléphone ne sont pas disponibles ici.');return}
   try{
     const r=await Notification.requestPermission();
-    toast(r==='granted'?'Notifications activées.':'Les notifications sont bloquées dans cet affichage.');
-    if(r==='granted')await syncPushSubscription();
+    if(r==='granted'){const s=await syncPushSubscription();toast(s.ok?'Notifications activées.':s.error)}
+    else toast('Les notifications sont bloquées dans cet affichage.');
   }catch(e){toast('Les notifications du téléphone ne sont pas disponibles ici.')}
   render();
 }
@@ -3273,7 +3291,7 @@ const ACT={
   anShift:el=>{U.anAnchor=shiftAnchor(U.anMode,U.anAnchor,+el.dataset.id);render()},
   notif:el=>{const n=S.notifs.find(x=>x.id===el.dataset.id);if(n&&n.go)go(n.go)},
   clearNotifs:async()=>{if(!await ask('Effacer les notifications ?','',{ok:'Effacer'}))return;S.notifs=[];Store.core();render()},
-  perm:askNotifPerm,preview:()=>{Sound.fx(S.settings.sound==='aucun'?'doux':S.settings.sound)},
+  perm:askNotifPerm,pushTest:()=>pushTest(),cloudBackups:()=>openCloudBackups(),preview:()=>{Sound.fx(S.settings.sound==='aucun'?'doux':S.settings.sound)},
   pin:openPin,lockNow:()=>lockNow(),cats:openCats,
   csv:()=>saveFile(`poka-historique-${today()}.csv`,csvHistory(),'text/csv'),
   pdf:openExport,backup,restore,reset:resetAll
@@ -3647,6 +3665,44 @@ function renderViewBar(){
 }
 ACT.shareReload=()=>{U.shares=null;render()};
 init();
+
+/* ---------- Sauvegardes automatiques (version en ligne) ---------- */
+const BK_KIND={auto:'Automatique','manuel':'Faite à la demande','avant-restauration':'Copie avant une restauration'};
+const bkWhen=iso=>{const d=new Date(iso);return new Intl.DateTimeFormat('fr-FR',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit'}).format(d)};
+async function openCloudBackups(){
+  if(Store.mode!=='supabase'||!SB||!ACCOUNT){toast('Disponible dans la version en ligne, avec un compte Poka.');return}
+  const s=sheet(`<h2>Sauvegardes automatiques</h2><p class="sub">Poka garde une copie de tes données chaque nuit, pendant 30 jours. Tu peux revenir à l\u2019une d\u2019elles si tu fais une erreur.</p><div data-bk-body><p class="empty">Chargement…</p></div>`);
+  await loadBackupList(s);
+}
+async function loadBackupList(s){
+  const body=s.querySelector('[data-bk-body]');if(!body)return;
+  const r=await SB.from('serenite_backups').select('id,kind,created_at').order('created_at',{ascending:false}).limit(40);
+  if(!body.isConnected)return;
+  if(r.error){body.innerHTML='<p class="empty">Les sauvegardes ne sont pas encore activées. Lance le fichier « 4-supabase-sauvegardes.sql » dans Supabase (SQL Editor), puis reviens ici.</p>';return}
+  const rows=r.data||[];
+  body.innerHTML=`<button class="btn ghost wide" data-bk-now>Sauvegarder maintenant</button>${rows.length?`<div class="list" style="margin-top:12px">${rows.map(x=>`<div class="op"><span class="mid"><span class="nm">${esc(bkWhen(x.created_at))}</span><span class="s">${esc(BK_KIND[x.kind]||x.kind)}</span></span><button class="pbtn" data-bk="${x.id}">Restaurer</button></div>`).join('')}</div>`:'<p class="empty" style="margin-top:10px">Aucune sauvegarde pour l\u2019instant : la première est faite cette nuit.</p>'}`;
+  body.querySelector('[data-bk-now]').onclick=async()=>{
+    toast('Sauvegarde en cours…');await waitSync();
+    const b=await SB.rpc('poka_backup_me',{p_kind:'manuel'});
+    if(b.error){toast('Sauvegarde impossible : '+b.error.message);return}
+    toast('Sauvegarde faite.');await loadBackupList(s);
+  };
+  body.querySelectorAll('[data-bk]').forEach(b=>b.onclick=()=>restoreCloud(+b.dataset.bk));
+}
+async function restoreCloud(id){
+  if(!await ask('Restaurer cette sauvegarde ?','Tes données actuelles seront remplacées par celles de cette sauvegarde. Une copie de tes données actuelles est d\u2019abord gardée dans la liste (« Copie avant une restauration »).',{ok:'Restaurer'}))return;
+  toast('Restauration…');
+  try{
+    await waitSync();
+    const b=await SB.rpc('poka_backup_me',{p_kind:'avant-restauration'});
+    if(b.error)throw b.error;
+    const r=await SB.from('serenite_backups').select('core,tx').eq('id',id).single();
+    if(r.error||!r.data)throw r.error||new Error('sauvegarde introuvable');
+    closeSheet(true);
+    replaceAll(r.data.core,r.data.tx);
+    toast('Sauvegarde restaurée.');
+  }catch(e){toast('Restauration impossible : '+(e&&e.message||e))}
+}
 </script>
 </body>
 </html>
