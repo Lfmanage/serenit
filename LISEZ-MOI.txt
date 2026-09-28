@@ -1,0 +1,58 @@
+POKA — DOSSIER COMPLET DU PROJET
+================================
+
+Appli : https://lfmanage.github.io/serenit/   (GitHub : compte lfmanage, dépôt "serenit")
+Projet Supabase : dlrivczpvzrelbmwsfyp
+
+CONTENU DU DOSSIER
+------------------
+1-site-GitHub/     Les fichiers du site, à envoyer sur GitHub.
+2-supabase/        Les fichiers à coller/déployer dans Supabase (base de données, notifications).
+3-sources/         Le code source de l'appli (pour les futures modifications). Facultatif au quotidien.
+
+!! Ne mets JAMAIS ce dossier entier sur GitHub (dépôt public) : seulement les fichiers de 1-site-GitHub.
+!! Le fichier 2-supabase/SECRETS-A-GARDER-PRIVE.txt contient des clés secrètes : garde-le pour toi.
+
+
+1) METTRE À JOUR L'APPLI (le cas le plus fréquent)
+--------------------------------------------------
+Sur GitHub, dépôt "serenit" : Add file > Upload files, puis envoie :
+   - index.html
+   - sw.js
+Commit. Attends 1 à 2 minutes, puis ferme et rouvre l'appli.
+(manifest.webmanifest et les icônes : seulement si le logo/nom change.)
+NE TOUCHE PAS à ton config.js déjà présent sur GitHub : il contient tes vraies clés.
+config.EXEMPLE.js n'est qu'un modèle, à ne pas envoyer.
+
+Si config.js doit contenir la clé des notifications, il doit ressembler à config.EXEMPLE.js
+(supabaseUrl, supabaseKey = ta clé publique, vapidPublicKey = la clé indiquée dedans).
+
+
+2) SUPABASE — ORDRE À RESPECTER (SQL Editor > coller > Run)
+-----------------------------------------------------------
+   1-supabase.sql            Tables et sécurité de base (comptes, données par utilisateur).
+   2-supabase-partage.sql    Gestion des accès (partage en lecture seule).
+   3-supabase-push.sql       Notifications (table + tâche planifiée).
+                             Avant de lancer : remplace COLLE_ICI_LA_MEME_CLE_QUE_SUPABASEKEY_DANS_CONFIG_JS
+                             par ta clé publique (la même que "supabaseKey" dans config.js).
+Chaque fichier ne se lance qu'une fois (les relancer ne casse rien).
+Authentication > URL Configuration : Site URL et Redirect URL = https://lfmanage.github.io/serenit/
+
+
+3) NOTIFICATIONS (fonction serveur)
+-----------------------------------
+   a. Supabase > Edge Functions > Create a new function, nom exact : send-daily-question
+      Colle le contenu de 2-supabase/fonction-send-daily-question/index.ts, puis déploie.
+   b. Edge Functions > Manage secrets : ajoute VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, CRON_SECRET
+      (valeurs dans SECRETS-A-GARDER-PRIVE.txt).
+   c. Lance 3-supabase-push.sql (voir ci-dessus).
+   d. config.js sur GitHub : ajoute la ligne vapidPublicKey (voir config.EXEMPLE.js).
+   e. Sur l'iPhone : supprime Poka de l'écran d'accueil, réinstalle-la depuis Safari,
+      puis Réglages > Notifications > Autoriser.
+
+
+4) MODIFIER L'APPLI PLUS TARD
+-----------------------------
+Les sources sont dans 3-sources/ (part1.html = design, part2 à part7.js = fonctionnement).
+Après modification : python3 3-sources/assembler.py reconstruit 1-site-GitHub/index.html.
+(Ou donne simplement ce dossier à Claude en lui décrivant ce que tu veux changer.)
