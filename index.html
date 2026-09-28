@@ -896,6 +896,25 @@ body.viewing .sheet .actions,body.viewing .sheet [data-edit],body.viewing .sheet
 .pc-ic svg{width:11px;height:11px}
 .pc-amt{font-family:var(--serif);font-size:12.5px;font-weight:600;white-space:nowrap;line-height:1.2}
 
+
+/* Budget du jour dans le bloc solde (à la place du pourcentage) */
+.hv-bud{flex:none;max-width:46%;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 11px;border-radius:15px;background:rgba(255,255,255,.62);text-align:center;color:var(--ink)}
+:root[data-theme="dark"] .hv-bud{background:rgba(255,255,255,.08)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .hv-bud{background:rgba(255,255,255,.08)}}
+.hv-bud .bl{font-size:9.5px;color:var(--ink-2);font-weight:600;letter-spacing:.02em}
+.hv-bud strong{font-family:var(--serif);font-size:19px;font-weight:600;color:var(--brand-ink);line-height:1.1;white-space:nowrap}
+.hv-bud strong em{font-style:normal;font-family:var(--sans);font-size:10px;color:var(--ink-2);font-weight:500;margin-left:2px}
+.hv-bud .bd{font-size:10px;color:var(--ink-2);white-space:nowrap}
+.hv-bud .bg{font-size:10px;color:var(--pos);font-weight:700;white-space:nowrap}
+.hv-bud.over strong{color:var(--bad)}
+/* Bouton + discret, dans un coin en bas */
+.fab{width:42px;height:42px;right:max(14px,calc(50% - 246px));bottom:calc(66px + env(safe-area-inset-bottom,0px));box-shadow:0 8px 18px -10px var(--hero-shadow)}
+.fab svg{width:20px;height:20px}
+@media (min-width:960px){.fab{right:32px;bottom:32px}}
+.choice-list.compact{gap:6px}
+.choice-list.compact .choice{padding:9px 12px;border-radius:16px}
+.choice-list.compact .choice .nm{font-size:15px}
+
 /* Statistiques simplifiées */
 .stat-list{display:flex;flex-direction:column;gap:10px;margin:0 0 30px}
 .stat{display:flex;align-items:center;gap:14px;width:100%;padding:16px 18px;border-radius:22px;background:var(--surface);box-shadow:var(--shadow);text-align:left;color:var(--ink)}
@@ -1866,7 +1885,6 @@ function upcomingShown(){
 }
 /* Carte « Budget du jour » */
 function budgetCard(){
-  if(!showOn('budget'))return '';
   const b=dailyBudget(),over=b.budget<0;
   const until=b.next.income?`jusqu\u2019au prochain revenu (${dShort(b.next.date)})`:'jusqu\u2019à la fin du mois';
   const pct=b.start>0?Math.min(100,b.spent/b.start*100):0;
@@ -1879,35 +1897,27 @@ function budgetCard(){
 }
 function vHome(){
   const f=forecast();
-  const mS=metrics(startOfMonth(today()),today()),prevTotal=f.total-mS.net;
+  const bd=showOn('budget')?dailyBudget():null;
   const urg=showOn('urgent')?todoOcc().filter(isUrgent):[],urgTotal=urg.reduce((s,o)=>s+o.amount,0);
   const shown=activePockets().filter(p=>p.show!==false&&!p.goalOnly);
   const up=showOn('echeances')?upcomingShown():[];
   const recent=[];const seenLink=new Set();
   if(showOn('operations'))for(const t of allTx()){if(t.link){if(seenLink.has(t.link))continue;seenLink.add(t.link);const pair=allTx().filter(x=>x.link===t.link);recent.push(pair.find(x=>x.a<0)||t)}else recent.push(t);if(recent.length>=3)break}
   const pchips=showOn('poches')&&shown.length?`<div class="pchips" role="list">${shown.map(p=>{const v=balance(p.id);return `<button class="pchip" role="listitem" data-go="pocket:${p.id}" style="view-transition-name:pk-${p.id}"><span class="pc-nm pname">${esc(pName(p.id))}</span><span class="pc-bot"><span class="pc-ic">${I[pIcon(p.id)]||''}</span><span class="pc-amt ${balCls(v)}">${countHTML('bal:'+p.id,v)}</span></span></button>`}).join('')}</div>`:'';
-  const hero=(showOn('total')||showOn('dispo')||pchips)?`<section class="hero v2 enter" aria-label="Situation générale">
+  const hero=(showOn('total')||showOn('dispo')||bd||pchips)?`<section class="hero v2 enter" aria-label="Situation générale">
     <div class="hv-row">
       <div class="hv-main">
         ${showOn('total')?`<span class="hv-lbl">Solde total</span><div class="hv-amt"><button class="bigbtn" data-a="discreet" style="${totalColorStyle(f.total)}" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${countHTML('total',f.total,'big')}</button><button class="eye" data-a="discreet" aria-label="${U.discreet?'Afficher':'Masquer'} les montants">${I.eye}</button></div>`:''}
       </div>
-      ${showOn('total')&&prevTotal!==0?`<div class="hv-badge">${evoHTML(f.total,prevTotal,true,'sm')}<small>ce mois-ci</small></div>`:''}
+      ${bd?`<button class="hv-bud${bd.budget<0?' over':''}" data-a="budgetInfo" aria-label="Budget du jour : ${money(bd.per)} par jour"><span class="bl">Budget du jour</span><strong>${money(bd.per)}<em>/jour</em></strong><span class="bd">${money(Math.max(0,bd.budget))} · ${bd.days} jour${bd.days>1?'s':''}</span>${bd.saved>0?`<span class="bg">${money(bd.saved)} économisés</span>`:''}</button>`:''}
     </div>
     ${showOn('dispo')?`<button class="after" data-a="forecast">Solde après prélèvements : <b class="${f.dispo<0?'neg':''}">${money(f.dispo)}</b>${I.chev}</button>`:''}
     ${pchips}
   </section>`:'';
-  const qa2=(U.viewing||!showOn('actions'))?'':`<nav class="qa2" style="grid-template-columns:repeat(${showOn('achats')?4:3},minmax(0,1fr))" aria-label="Actions rapides">
-    <button data-a="income"><i class="ci primary">${I.plus}</i><span>Ajouter</span></button>
-    ${showOn('achats')?`<button data-a="addPurchase"><i class="ci">${I.cart}</i><span>Achat</span></button>`:''}
-    <button data-a="transfer"><i class="ci">${I.swap}</i><span>Transférer</span></button>
-    <button data-a="moreSheet"><i class="ci">${I.dots}</i><span>Plus</span></button>
-  </nav>`;
   return `<header class="top home-top"><h1>Accueil</h1>${bellBtn()}<button class="avatar sm" data-go="settings" aria-label="Profil et réglages">${initial()}</button></header>
   ${hero}
   ${urg.length?`<button class="urgent-banner" data-a="urgentView">${tileHTML('alert','bad')}<span class="mid"><b>URGENT</b><span class="s">${urg.length>1?`${urg.length} paiements à régler, ${money(urgTotal)}`:`${esc(billName(urg[0]))}, ${money(urgTotal)} à régler`}</span></span><span class="chev">${I.chev}</span></button>`:''}
   ${U.viewing?'':incomeCards()}
-  ${qa2}
-  ${budgetCard()}
   <div class="home-grid">
   ${showOn('echeances')?`<section class="blk"><div class="sec"><h2>Échéances à venir</h2><button class="more" data-go="bills">Tout voir<span class="mchev">${I.chev}</span></button></div>
     ${up.length?`<div class="list">${up.map(dueRow).join('')}</div>`:`<p class="empty">Rien à venir dans les ${S.settings.upcomingDays} prochains jours.</p>`}</section>`:''}
@@ -2954,21 +2964,24 @@ function openWithdrawPick(){
 }
 function openMore(){
   const items=[
-    showOn('achats')&&['addPurchase','cart','Nouvel achat','Une dépense du quotidien'],
-    ['newPocket','wallet','Nouvelle poche','Un endroit où ranger ton argent'],
-    ['newGoal','target','Nouvel objectif','Une somme à atteindre'],
-    showOn('echeances')&&['addBill','cal','Nouvelle échéance','Un paiement à venir'],
-    ['gotoSettings','gear','Réglages','Compte, sécurité, apparence']
+    ['income','arrowIn','Ajouter de l\u2019argent'],
+    showOn('achats')&&['addPurchase','cart','Nouvel achat'],
+    ['transfer','swap','Transférer'],
+    ['newPocket','wallet','Nouvelle poche'],
+    ['newGoal','target','Nouvel objectif'],
+    showOn('echeances')&&['addBill','cal','Nouvelle échéance'],
+    ['gotoSettings','gear','Réglages']
   ].filter(Boolean);
-  const s=sheet(`<h2>Plus</h2><div class="choice-list">${items.map(([k,ic,t,sub])=>`<button class="choice" data-k="${k}">${tileHTML(ic)}<span class="mid"><span class="nm">${t}</span><span class="s">${sub}</span></span><span class="chev">${I.chev}</span></button>`).join('')}</div>`);
+  const s=sheet(`<h2>Ajouter</h2><div class="choice-list compact">${items.map(([k,ic,t])=>`<button class="choice" data-k="${k}">${tileHTML(ic,'sm')}<span class="mid"><span class="nm">${t}</span></span><span class="chev">${I.chev}</span></button>`).join('')}</div>`);
   s.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{
     const k=b.dataset.k;closeSheet(true);
     if(k==='gotoSettings'){go('settings');return}
     if(ACT[k])ACT[k]({dataset:{}});
   });
 }
-
-/* Message après un achat : effet sur le budget par jour + petit encouragement */
+function openBudget(){
+  sheet(`<h2>Budget du jour</h2>${budgetCard()}<p class="s" style="margin:4px 2px 0;line-height:1.45">Ton budget, c\u2019est l\u2019argent de tes poches courantes, moins tes échéances et ton épargne prévue jusqu\u2019au prochain revenu, réparti sur les jours restants. L\u2019argent réservé à tes objectifs n\u2019est jamais compté.</p>`);
+}
 function impactToast(b0,a,pid){
   const base=`Achat de ${money(a)} enregistré.`;
   if(!b0||!showOn('budget')||isSaving(pid))return base;
@@ -3412,7 +3425,7 @@ function render(){
   const cur=U.view==='pocket'?'pockets':U.view;
   $$('#tabs [data-go]').forEach(b=>b.setAttribute('aria-current',b.dataset.go===cur?'page':'false'));
   if(TABS.some(x=>x[0]===U.view)&&!tabOn(U.view)){U.view='home';main.innerHTML=VIEWS.home()}
-  const fab=$('#fab');fab.hidden=U.viewing||['settings','notifs','pocket'].includes(U.view)||(U.view==='home'&&showOn('actions'));fab.classList.remove('away');$('#tabs').classList.remove('hide');
+  const fab=$('#fab');fab.hidden=U.viewing||['settings','notifs','pocket'].includes(U.view)||(U.view==='home'&&!showOn('actions'));fab.classList.remove('away');$('#tabs').classList.remove('hide');
   document.body.classList.toggle('viewing',!!U.viewing);renderViewBar();
   animateCounts();
   document.body.classList.toggle('discreet',U.discreet);
@@ -3449,7 +3462,7 @@ function goBack(){
   });
 }
 const ACT={
-  back:goBack,close:()=>closeSheet(),forecast:openForecast,quick:()=>openPurchase({fab:true}),
+  back:goBack,close:()=>closeSheet(),forecast:openForecast,quick:()=>openMore(),budgetInfo:()=>openBudget(),
   qs:el=>{const k=el.dataset.id;if(k==='achat')openPurchase({fab:true});else if(k==='revenu')openIncome(null,null,{fab:true});else if(k==='echeance')openBillForm(null,{fab:true});else if(k==='transfert')openTransfer('',{fab:true});else openSave('',{fab:true})},
   transfer:el=>openTransfer(el.dataset.id||''),
   shareAdd:()=>openShareAdd(),shareRemove:el=>removeShare(el.dataset.id),viewOwner:el=>enterView(el.dataset.id),exitView:()=>exitView(),
